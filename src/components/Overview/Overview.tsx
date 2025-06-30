@@ -24,7 +24,7 @@ interface StatCardProps {
   value: string;
 }
 
-export default function Overview(): JSX.Element {
+export default function Overview() {
   const [products, setProducts] = useState<productData[]>([]);
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState<{
@@ -241,7 +241,7 @@ export default function Overview(): JSX.Element {
   );
 }
 
-function StatCard({ title, value }: StatCardProps): JSX.Element {
+function StatCard({ title, value }: StatCardProps) {
   return (
     <div className="p-4 bg-white shadow rounded-xl border">
       <div className="text-gray-500 text-sm mb-1">{title}</div>
