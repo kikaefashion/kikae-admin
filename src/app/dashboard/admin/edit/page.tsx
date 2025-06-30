@@ -3,7 +3,7 @@ import { ArrowBack } from "@/assets/ArrowBack";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function CreateAdminUser(): JSX.Element {
+export default function CreateAdminUser() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
