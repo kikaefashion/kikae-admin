@@ -1,23 +1,29 @@
 "use client";
+import Loader from "@/components/Loader";
+import { addLogistic } from "@/networking/endpoints/logistics/addLogistic";
 import { useState } from "react";
 
-interface City {
+/* interface City {
   name: string;
   fee: string;
-}
+} */
 
 export default function AddLogisticsProvider() {
-  const [cities, setCities] = useState<City[]>([
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  /*   const [cities, setCities] = useState<City[]>([
     { name: "Ikeja", fee: "2500" },
     { name: "Ikorodu", fee: "3000" },
     { name: "Epe", fee: "3500" },
-  ]);
+  ]); */
 
-  const addCity = () => {
+  /*   const addCity = () => {
     setCities([...cities, { name: "", fee: "" }]);
   };
-
-  const removeCity = (index: number) => {
+ */
+  /*  const removeCity = (index: number) => {
     setCities(cities.filter((_, i) => i !== index));
   };
 
@@ -29,8 +35,13 @@ export default function AddLogisticsProvider() {
     const updatedCities = [...cities];
     updatedCities[index][field] = value;
     setCities(updatedCities);
-  };
+  }; */
 
+  const handleAddLogistic = async () => {
+    setIsLoading(true);
+    await addLogistic(name, email, number);
+    setIsLoading(false);
+  };
   return (
     <div
       className="text-black"
@@ -41,12 +52,14 @@ export default function AddLogisticsProvider() {
       </h2>
 
       <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         type="text"
         placeholder="Company name"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
 
-      <select className="w-full border p-3.5 rounded-3xl mb-3">
+      {/*    <select className="w-full border p-3.5 rounded-3xl mb-3">
         <option>Delivering from (State)</option>
         <option>Lagos</option>
         <option>Abuja</option>
@@ -58,9 +71,9 @@ export default function AddLogisticsProvider() {
         <option>Kano</option>
         <option>Imo</option>
         <option>Ogun</option>
-      </select>
+      </select> */}
 
-      <h3 className="text-lg font-medium mb-2 text-center">
+      {/*    <h3 className="text-lg font-medium mb-2 text-center">
         Cities & Delivery Fees
       </h3>
       {cities.map((city, index) => (
@@ -83,30 +96,37 @@ export default function AddLogisticsProvider() {
             ✖
           </button>
         </div>
-      ))}
-
+      ))} */}
+      {/* 
       <button className="text-kikaeBlue mb-3" onClick={addCity}>
         + Add city
-      </button>
+      </button> */}
 
       <input
+        value={number}
+        onChange={(e) => setNumber(e.target.value)}
         type="text"
         placeholder="Company Contact Number"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
-      <input
+      {/*   <input
         type="text"
         placeholder="WhatsApp Number"
         className="w-full border p-3.5 rounded-3xl mb-3"
-      />
+      /> */}
       <input
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         type="email"
         placeholder="Company Email"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
 
-      <button className="w-full bg-kikaeBlue text-white p-3.5 rounded-3xl mb-2">
-        Save logistics provider
+      <button
+        onClick={handleAddLogistic}
+        className="w-full bg-kikaeBlue text-white p-3.5 rounded-3xl mb-2"
+      >
+        {isLoading ? <Loader /> : " Save logistics provider"}
       </button>
       <button className="w-full border p-3.5 rounded-3xl">Cancel</button>
     </div>

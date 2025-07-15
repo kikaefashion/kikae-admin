@@ -131,7 +131,7 @@ const ProductDetails = () => {
           <div>
             <h3 className="text-kikaeBlue font-semibold">Price</h3>
             <p className="text-lg text-black">
-              ₦{product?.price?.toLocaleString()}
+              ₦{product?.price ? product?.price?.toLocaleString() : 0}
             </p>
           </div>
           <div>
@@ -139,7 +139,7 @@ const ProductDetails = () => {
               Old Price
             </h3>
             <p className="line-through text-gray-400">
-              ₦{product?.old_price?.toLocaleString()}
+              ₦{product?.old_price ? product?.old_price?.toLocaleString() : 0}
             </p>
           </div>
           <div>
@@ -158,7 +158,9 @@ const ProductDetails = () => {
             <h3 className="text-kikaeBlue text-gray-500 font-semibold">
               Units
             </h3>
-            <p className="text-black">{product?.units?.toLocaleString()}</p>
+            <p className="text-black">
+              {product?.units ? product?.units?.toLocaleString() : 0}
+            </p>
           </div>
           <div>
             <h3 className="text-kikaeBlue text-gray-500 font-semibold">

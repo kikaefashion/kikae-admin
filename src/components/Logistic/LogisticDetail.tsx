@@ -1,3 +1,10 @@
+"use client";
+
+import { getLogistic } from "@/networking/endpoints/logistics/getLogistic";
+import { LogisticsType } from "@/types/logisticsType";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
 interface LogisticsProvider {
   name: string;
   deliveringFrom: string;
@@ -21,6 +28,19 @@ const logisticsProvider: LogisticsProvider = {
 };
 
 export default function LogisticsProviderDetails() {
+  const params = useParams<{ id: string }>();
+  const [logistic, setLogistic] = useState<LogisticsType>();
+
+  useEffect(() => {
+    const handleGetLogistic = async () => {
+      if (!params.id) return;
+      const logisticResult = await getLogistic(params.id);
+
+      setLogistic(logisticResult.data);
+    };
+
+    handleGetLogistic();
+  }, [params.id]);
   return (
     <div className="p-6">
       <div className=" p-6 bg-white rounded-lg shadow-lg text-black">

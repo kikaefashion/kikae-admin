@@ -236,11 +236,17 @@ const Table = () => {
                 >
                   {item.name}
                 </td>
-                <td className="p-3">₦{item.price.toLocaleString()}</td>
-                <td className="p-3">₦{item.old_price.toLocaleString()}</td>
+                <td className="p-3">
+                  ₦{item.price ? item?.price?.toLocaleString() : 0}
+                </td>
+                <td className="p-3">
+                  ₦{item.old_price ? item?.old_price?.toLocaleString() : 0}
+                </td>
                 <td className="p-3">{item.category.name}</td>
                 <td className="p-3">{item.product_category.name}</td>
-                <td className="p-3">{item.units.toLocaleString()}</td>
+                <td className="p-3">
+                  {item.units ? item.units.toLocaleString() : 0}
+                </td>
                 <td className="p-3">{item.size}</td>
                 {status == "pending" ? (
                   <td className="px-6 py-4 flex flex-row gap-2.5">
