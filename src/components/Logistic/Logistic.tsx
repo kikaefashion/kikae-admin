@@ -33,6 +33,20 @@ import { removeLogistic } from "@/networking/endpoints/logistics/deleteLogistic"
     },
   ]; */
 
+function formatListWithEllipsis(items: string[], limit: number = 3): string {
+  if (!items || items.length === 0) return "";
+  const sliced = items.slice(0, limit).join(", ");
+  return items.length > limit ? `${sliced}, ...` : sliced;
+}
+
+function getAreas(destinations: LogisticsType["destinations"]): string {
+  return formatListWithEllipsis(destinations.map((item) => item.area));
+}
+
+function getStates(destinations: LogisticsType["destinations"]): string {
+  return formatListWithEllipsis(destinations.map((item) => item.state.name));
+}
+
 export default function LogisticsTable() {
   const [search, setSearch] = useState("");
   const action = useSearchParams().get("action");
@@ -51,6 +65,7 @@ export default function LogisticsTable() {
     };
     fetchLogistics();
   }, []);
+
   return (
     <div className="p-6 ">
       <MyModal
@@ -80,11 +95,10 @@ export default function LogisticsTable() {
         <table className="w-full text-left">
           <thead className="text-kikaeBlue">
             <tr>
-              <th className="p-3">Company name</th>
-              <th className="p-3">Delivering From</th>
-              <th className="p-3">Delivering To</th>
-              <th className="p-3">Cities covered</th>
-              <th className="p-3">Base Fee (₦)</th>
+              <th className="p-3">Name</th>
+              <th className="p-3">States Covered</th>
+              <th className="p-3">Areas Covered</th>
+
               <th className="p-3">Actions</th>
             </tr>
           </thead>
@@ -100,10 +114,9 @@ export default function LogisticsTable() {
                   >
                     {logistics.name}
                   </td>
-                  <td className="p-3">{"logistics.from"}</td>
-                  <td className="p-3">{"logistics.to"}</td>
-                  <td className="p-3">{"logistics.cities"}</td>
-                  <td className="p-3">{"logistics.fee"}</td>
+                  <td className="p-3">{getStates(logistics.destinations)}</td>
+                  <td className="p-3">{getAreas(logistics.destinations)}</td>
+
                   <td className="p-3">
                     <Link
                       href={`?action=edit_logistic&logistic=${logistics.id}`}
