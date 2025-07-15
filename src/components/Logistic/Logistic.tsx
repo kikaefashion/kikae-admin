@@ -8,6 +8,7 @@ import Link from "next/link";
 import { LogisticsType } from "@/types/logisticsType";
 import { getLogistics } from "@/networking/endpoints/getLogistics";
 import { removeLogistic } from "@/networking/endpoints/logistics/deleteLogistic";
+import TooltipText from "../TooltipText";
 
 /* const logisticsData = [
     {
@@ -114,8 +115,24 @@ export default function LogisticsTable() {
                   >
                     {logistics.name}
                   </td>
-                  <td className="p-3">{getStates(logistics.destinations)}</td>
-                  <td className="p-3">{getAreas(logistics.destinations)}</td>
+                  <td className="p-3">
+                    <TooltipText
+                      fullText={logistics.destinations
+                        .map((item) => item.state.name)
+                        .join(", ")}
+                    >
+                      {getStates(logistics.destinations)}
+                    </TooltipText>
+                  </td>
+                  <td className="p-3">
+                    <TooltipText
+                      fullText={logistics.destinations
+                        .map((item) => item.area)
+                        .join(", ")}
+                    >
+                      {getAreas(logistics.destinations)}
+                    </TooltipText>
+                  </td>
 
                   <td className="p-3">
                     <Link
