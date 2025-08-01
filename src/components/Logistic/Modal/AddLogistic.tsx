@@ -8,7 +8,11 @@ import { useState } from "react";
   fee: string;
 } */
 
-export default function AddLogisticsProvider() {
+export default function AddLogisticsProvider({
+  closeModal,
+}: {
+  closeModal: () => void;
+}) {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -128,7 +132,9 @@ export default function AddLogisticsProvider() {
       >
         {isLoading ? <Loader /> : " Save logistics provider"}
       </button>
-      <button className="w-full border p-3.5 rounded-3xl">Cancel</button>
+      <button onClick={closeModal} className="w-full border p-3.5 rounded-3xl">
+        Cancel
+      </button>
     </div>
   );
 }

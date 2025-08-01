@@ -11,11 +11,11 @@ import {
   Legend,
 } from "chart.js";
 import { getProducts } from "@/networking/endpoints/products/getProducts";
-import { productData } from "@/types/ProductType";
+import type { productData } from "@/types/ProductType";
 import { getCategories } from "@/networking/endpoints/categories/getCategories";
 import { getAllUsers } from "@/networking/endpoints/users/getAllUsers";
 import { getDashboardStats } from "@/networking/endpoints/overview/dashboardStats";
-import { userAddress, UserProfileType } from "@/types/types";
+import type { userAddress, UserProfileType } from "@/types/types";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -40,6 +40,17 @@ export default function Overview() {
       address: userAddress;
     }>;
     monthly_completed_orders: [];
+    monthly_new_users: Array<{
+      month: string;
+      total_users: string;
+      usertype: UserProfileType;
+      followings: [];
+      addresses: [];
+    }>;
+    monthly_wishlist: Array<{
+      month: string;
+      total_likes: string;
+    }>;
   }>({
     total_products: 0,
     total_categories: categories.length,
@@ -48,32 +59,33 @@ export default function Overview() {
     completed_orders: 0,
     monthly_revenue: [],
     monthly_completed_orders: [],
+    monthly_new_users: [],
+    monthly_wishlist: [],
   });
+
   const [salesData, setSalesData] = useState<ChartData<"bar">>({
     labels: [],
     datasets: [],
   });
+
   const [userEngagementData, setUserEngagementData] = useState<
     ChartData<"bar">
   >({
     labels: [],
     datasets: [],
   });
+
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();
       setProducts(products.data);
-
       const categories = await getCategories();
       setCategories(categories.data);
-
       const users = await getAllUsers();
       setUsers(users.users);
-
       const result = await getDashboardStats();
-
       setDashboardStats(result);
     };
     fetchProducts();
@@ -95,15 +107,14 @@ export default function Overview() {
       "November",
       "December",
     ];
-
     const monthlyRevenueData = new Array(12).fill(0);
 
     // Map the revenue data to the correct months
     dashboardStats.monthly_revenue.forEach((item) => {
       const monthYear = item.month; // Format: "2025-06"
-      const monthIndex = parseInt(monthYear.split("-")[1]) - 1; // Convert to 0-based index
+      const monthIndex = Number.parseInt(monthYear.split("-")[1]) - 1; // Convert to 0-based index
       if (monthIndex >= 0 && monthIndex < 12) {
-        monthlyRevenueData[monthIndex] = parseFloat(item.total_revenue);
+        monthlyRevenueData[monthIndex] = Number.parseFloat(item.total_revenue);
       }
     });
 
@@ -118,23 +129,51 @@ export default function Overview() {
       ],
     });
 
+    // Process user engagement data
+    const currentMonth = new Date().toISOString().slice(0, 7); // Format: "2025-07"
+
+    // Get new users for current month
+    const currentMonthNewUsers = dashboardStats.monthly_new_users.find(
+      (item) => item.month === currentMonth
+    );
+    const newUsersThisMonth = currentMonthNewUsers
+      ? Number.parseInt(currentMonthNewUsers.total_users)
+      : 0;
+
+    // Get wishlist adds for current month
+    const currentMonthWishlist = dashboardStats.monthly_wishlist.find(
+      (item) => item.month === currentMonth
+    );
+    const wishlistAddsThisMonth = currentMonthWishlist
+      ? Number.parseInt(currentMonthWishlist.total_likes)
+      : 0;
+
+    // Calculate active users (you can modify this logic based on your needs)
+    // For now, using total users as a placeholder for active users
+    const activeUsersToday = dashboardStats.total_users;
+
     setUserEngagementData({
       labels: ["Active users today", "New users this month", "Wishlist adds"],
       datasets: [
         {
           label: "Engagement",
-          data: [70000, 90000, 65000],
+          data: [activeUsersToday, newUsersThisMonth, wishlistAddsThisMonth],
           backgroundColor: ["#3B82F6", "#6EE7B7", "#F472B6"],
         },
       ],
     });
-  }, [dashboardStats.monthly_revenue]);
+  }, [
+    dashboardStats.monthly_revenue,
+    dashboardStats.monthly_new_users,
+    dashboardStats.monthly_wishlist,
+    dashboardStats.total_users,
+  ]);
 
   return (
     <div className="p-6 space-y-6 text-black">
       <div className="text-2xl font-bold">Hello, Dooyum! 👋</div>
       <div className="text-gray-600">
-        Here’s your platform’s performance at a glance.
+        Here&apos;s your platform&apos;s performance at a glance.
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -167,7 +206,7 @@ export default function Overview() {
             Revenue this month: ₦
             {dashboardStats.monthly_revenue
               .reduce(
-                (total, item) => total + parseFloat(item.total_revenue),
+                (total, item) => total + Number.parseFloat(item.total_revenue),
                 0
               )
               .toLocaleString()}{" "}
@@ -186,7 +225,15 @@ export default function Overview() {
         <div className="p-4 border rounded-xl shadow bg-white">
           <h2 className="text-lg font-semibold mb-2">User engagement</h2>
           <div className="text-sm text-gray-500 mb-2">
-            Orders Completed: 5,670
+            New users this month:{" "}
+            {dashboardStats.monthly_new_users.find(
+              (item) => item.month === new Date().toISOString().slice(0, 7)
+            )?.total_users || "0"}
+            <br />
+            Wishlist adds:{" "}
+            {dashboardStats.monthly_wishlist.find(
+              (item) => item.month === new Date().toISOString().slice(0, 7)
+            )?.total_likes || "0"}
           </div>
           <Bar
             data={userEngagementData}

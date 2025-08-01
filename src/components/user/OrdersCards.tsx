@@ -2,56 +2,51 @@
 import { ArrowBack } from "@/assets/ArrowBack";
 import { mediaUrlPrefix } from "@/networking/apiUrl";
 import { useBoundStore } from "@/store/store";
+import { OrderItem } from "@/types/UserOrdersTypes";
 import { useRouter } from "next/navigation";
-import React from "react";
+import type React from "react";
+import { useState, useMemo } from "react";
+//import type { OrderItem } from "./types"; // Assuming this is the correct import path
 
-/* const orders = [
-  {
-    id: "#882946",
-    name: "Vintage shirt roll-up",
-    price: "₦60,000",
-    category: "Thrift",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg", // Replace with actual image
-  },
-  {
-    id: "#882946",
-    name: "Vintage shirt roll-up",
-    price: "₦60,000",
-    category: "Thrift",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    id: "#882946",
-    name: "Vintage shirt roll-up",
-    price: "₦60,000",
-    category: "Thrift",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    id: "#882946",
-    name: "Grey suit and hat",
-    price: "₦80,000",
-    category: "Thrift",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    id: "#882946",
-    name: "Grey suit and hat",
-    price: "₦80,000",
-    category: "Thrift",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-];
- */
 const OrdersGrid = () => {
   const router = useRouter();
-
   const userOrders = useBoundStore((state) => state.userOrders);
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+
+  const months = [
+    { value: "all", label: "All Months" },
+    { value: "0", label: "January" },
+    { value: "1", label: "February" },
+    { value: "2", label: "March" },
+    { value: "3", label: "April" },
+    { value: "4", label: "May" },
+    { value: "5", label: "June" },
+    { value: "6", label: "July" },
+    { value: "7", label: "August" },
+    { value: "8", label: "September" },
+    { value: "9", label: "October" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
+  ];
+
+  // Filter orders based on selected month
+  const filteredOrders = useMemo(() => {
+    if (selectedMonth === "all") {
+      return userOrders;
+    }
+
+    return userOrders.filter((order: OrderItem) => {
+      const orderDate = new Date(order.created_at);
+      const orderMonth = orderDate.getMonth(); // getMonth() returns 0-11
+      return orderMonth === Number.parseInt(selectedMonth);
+    });
+  }, [userOrders, selectedMonth]);
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  console.log({ userOrders, filteredOrders, selectedMonth });
 
   return (
     <div className="p-6 text-black">
@@ -60,30 +55,35 @@ const OrdersGrid = () => {
           <button onClick={() => router.back()} className="cursor-pointer">
             <ArrowBack />
           </button>
-
-          <h2 className="text-xl font-semibold ">Orders</h2>
+          <h2 className="text-xl font-semibold">Orders</h2>
         </div>
-
         {/* Month Selector */}
-        <div className="flex ">
+        <div className="flex items-center">
           <label className="text-gray-600 mr-2">Select month:</label>
-          <select className="border p-1 rounded-md">
-            <option>January</option>
-            <option>February</option>
-            <option>March</option>
-            <option>April</option>
-            <option>May</option>
+          <select
+            className="border p-1 rounded-md"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+          >
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
       {/* Orders Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 ">
-        {userOrders.length !== 0 &&
-          userOrders.map((order, index) => (
-            <div key={index} className="p-3 rounded-3xl relative">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {filteredOrders.length !== 0 ? (
+          filteredOrders.map((order: OrderItem) => (
+            <div key={order.id} className="p-3 rounded-3xl relative">
               <img
-                src={mediaUrlPrefix + order.product.media[0].url}
+                src={
+                  mediaUrlPrefix + order.product.media[0].url ||
+                  "/placeholder.svg"
+                }
                 alt={order.name}
                 className="rounded-3xl w-full"
               />
@@ -94,7 +94,18 @@ const OrdersGrid = () => {
               <p className="text-kikaeGrey">{order.price}</p>
               <p className="text-kikaeGrey text-sm">{order.product.thrift}</p>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500">
+              {selectedMonth === "all"
+                ? "No orders found"
+                : `No orders found for ${
+                    months.find((m) => m.value === selectedMonth)?.label
+                  }`}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

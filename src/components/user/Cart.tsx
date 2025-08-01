@@ -84,29 +84,6 @@ const Cart = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex justify-between items-center mt-4">
-                <button
-                  //   onClick={() => removeItem(item.id)}
-                  className="text-gray-500 hover:text-red-500"
-                >
-                  {/*    <Trash size={18} /> */}
-                </button>
-                <div className="flex items-center space-x-2">
-                  <button
-                    //  onClick={() => updateQuantity(item.id, -1)}
-                    className="px-2 py-1 bg-gray-200 rounded-lg"
-                  >
-                    {/*  <Minus size={14} /> */}
-                  </button>
-                  <span className="w-6 text-center">{item.units}</span>
-                  <button
-                    //   onClick={() => updateQuantity(item.id, 1)}
-                    className="px-2 py-1 bg-blue-500 text-white rounded-lg"
-                  >
-                    {/*    <Plus size={14} /> */}
-                  </button>
-                </div>
-              </div>
             </div>
           ))}
       </div>

@@ -18,6 +18,7 @@ export const adminLogin = async (email: string, password: string) => {
     const result = await response.json();
 
     if (!response.ok) {
+      alert("invalid details");
       return;
     }
 
@@ -26,5 +27,7 @@ export const adminLogin = async (email: string, password: string) => {
     });
 
     return result;
-  } catch {}
+  } catch {
+    alert("something went wrong");
+  }
 };

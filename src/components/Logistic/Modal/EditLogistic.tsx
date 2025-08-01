@@ -13,15 +13,15 @@ import { Check } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-const EditLogisticsProvider = () => {
+const EditLogisticsProvider = ({ closeModal }: { closeModal: () => void }) => {
   return (
     <Suspense>
-      <EditLogistics />
+      <EditLogistics closeModal={closeModal} />
     </Suspense>
   );
 };
 
-function EditLogistics() {
+function EditLogistics({ closeModal }: { closeModal: () => void }) {
   const logistic_id = useSearchParams().get("logistic");
   const [logistic, setLogistic] = useState<LogisticsType>();
   const [name, setName] = useState(logistic?.name);
@@ -257,7 +257,9 @@ function EditLogistics() {
       >
         {isLoading ? <Loader /> : "  update logistics provider"}
       </button>
-      <button className="w-full border p-3.5 rounded-3xl">Cancel</button>
+      <button onClick={closeModal} className="w-full border p-3.5 rounded-3xl">
+        Cancel
+      </button>
     </div>
   );
 }

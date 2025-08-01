@@ -113,7 +113,7 @@ const ProductDetails = () => {
       </div>
 
       {/* Image Gallery */}
-      <ImageGallery />
+      {product?.media && <ImageGallery images={product?.media} />}
 
       <div className="flex flex-row">
         <div className="flex flex-col gap-2 mt-4 w-1/4">

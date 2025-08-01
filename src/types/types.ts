@@ -26,6 +26,8 @@ export type UserProfileType = {
     name: "Vendor" | "Customer";
     description: string;
   };
+
+  created_at: string;
 };
 
 export type reportedUsers = {

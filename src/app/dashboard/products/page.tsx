@@ -138,7 +138,7 @@ const Table = () => {
       <div className="flex flex-row items-center items-center justify-between mb-6">
         <div className="w-[26.68rem]   flex justify-between items-center bg-white rounded-3xl border border-black/25 ">
           <input
-            placeholder="search for a user"
+            placeholder="search for a product"
             // value={search}
             // onChange={(e) => setSearch(e.target.value)}
 
@@ -222,7 +222,7 @@ const Table = () => {
                 <td className="p-3">
                   <img
                     src={
-                      mediaUrlPrefix + item.media[0].url || "/placeholder.svg"
+                      mediaUrlPrefix + item.media[0]?.url || "/placeholder.svg"
                     }
                     alt={item.name}
                     className="w-10 h-10 rounded"
@@ -247,7 +247,9 @@ const Table = () => {
                 <td className="p-3">
                   {item.units ? item.units.toLocaleString() : 0}
                 </td>
-                <td className="p-3">{item.size}</td>
+                <td className="p-3">
+                  {item.sizes.map((item) => item?.size)?.join(", ")}
+                </td>
                 {status == "pending" ? (
                   <td className="px-6 py-4 flex flex-row gap-2.5">
                     <button

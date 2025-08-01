@@ -109,12 +109,12 @@ const Login = () => {
         </button>
       </form>
       <div className="flex flex-row justify-between items-center">
-        <Link
+        {/*   <Link
           href={"/admin_auth/register"}
           className="text-kikaeBlue text-center mt-6 mr-6"
         >
           Create an account
-        </Link>
+        </Link> */}
         <Link
           href={"/admin_auth/admin_login"}
           className="text-kikaeBlue text-center mt-6"

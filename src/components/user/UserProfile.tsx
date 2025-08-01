@@ -6,6 +6,7 @@ import { ArrowBack } from "@/assets/ArrowBack";
 import Link from "next/link";
 import { UserProfileType } from "@/types/types";
 import DeleteUserModal from "./DeleteUserModal";
+import { useBoundStore } from "@/store/store";
 
 const UserProfile = ({
   //  user,
@@ -17,14 +18,16 @@ const UserProfile = ({
   const router = useRouter();
   const [isDeleteUserModalVisible, setIsDeleteUserModalVisible] =
     useState(false);
+  const userOrders = useBoundStore((state) => state.userOrders);
   const search = useSearchParams().get("details");
+  const userCart = useBoundStore((state) => state.userCart);
 
   const user = {
-    firstName: "Henry",
-    lastName: "Richard",
-    email: "henrich@gmail.com",
-    phoneNumber: "Gend",
-    creationDate: "20-Oct-24",
+    firstName: userDetails?.fname,
+    lastName: userDetails?.lname,
+    email: userDetails.email,
+    phoneNumber: userDetails.phone,
+    creationDate: userDetails.created_at,
     gender: "Male",
     details: [
       {
@@ -35,7 +38,7 @@ const UserProfile = ({
       },
       {
         label: "Orders",
-        count: 12,
+        count: userOrders?.length,
         link: "View all orders",
         hrefLink: "orders",
       },
@@ -51,15 +54,22 @@ const UserProfile = ({
         link: "View all ongoing delivery",
         hrefLink: "delivery",
       },
-      {
+      /*   {
         label: "Reviews & comments",
         count: 4,
         link: "View all reviews & comments",
         hrefLink: "comments",
+      }, */
+      {
+        label: "Cart",
+        count: userCart?.length,
+        link: "View all",
+        hrefLink: "cart",
       },
-      { label: "Cart", count: 10, link: "View all", hrefLink: "cart" },
     ],
   };
+
+  const creationDate = new Date(userDetails.created_at);
 
   return (
     <div className="pr-6">
@@ -143,7 +153,7 @@ const UserProfile = ({
           </div>
           <div>
             <p className="font-semibold text-blue-600">Creation date</p>
-            <p>{"oct-20-22"}</p>
+            <p>{creationDate.toDateString()}</p>
           </div>
           <div>
             <p className="font-semibold text-blue-600">Gender</p>

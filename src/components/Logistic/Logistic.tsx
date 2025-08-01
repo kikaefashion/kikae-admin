@@ -77,7 +77,7 @@ export default function LogisticsTable() {
         }
         close={() => router.back()}
       >
-        <Index />
+        <Index closeModal={() => router.back()} />
       </MyModal>
       <div className="flex justify-between items-center mb-4">
         <input
