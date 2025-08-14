@@ -1,21 +1,31 @@
 "use client";
 import { ArrowBack } from "@/assets/ArrowBack";
 import Loader from "@/components/Loader";
-import { assignAdminRole } from "@/networking/endpoints/assignAdminRole";
+//import { assignAdminRole } from "@/networking/endpoints/assignAdminRole";
+import { editAdmin } from "@/networking/endpoints/editAdmin/editAdmin";
+import { AdminProfileType } from "@/types/types";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreateAdminUser() {
-  const [firstName, setFirstName] = useState("");
+  /*  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); */
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const params = useParams<{ admin: string }>();
-  //const[admin,setAdmin]= useState()
+
+  const [admin, setAdmin] = useState<AdminProfileType>({
+    name: "",
+    email: "",
+    //defaultPassword: "",
+    role: "",
+    id: "",
+    // isBlocked: false,
+  });
 
   const roles = [
     { name: "Sub admin", role: "subadmin" },
@@ -26,10 +36,26 @@ export default function CreateAdminUser() {
     { name: "Support admin", role: "supportadmin" },
   ];
 
-  const handleAssignRole = async () => {
+  //const handleGetAdmin = async () => {};
+
+  /*  const handleAssignRole = async () => {
     setIsLoading(true);
     await assignAdminRole(params.admin, selectedRole);
     setIsLoading(false);
+  }; */
+
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (!admin) return null;
+  const handleEditAdmin = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+    }
+    setIsLoading(true);
+    await editAdmin(params.admin, admin?.name, password, selectedRole);
+    setIsLoading(false);
+    router.back();
   };
 
   return (
@@ -47,7 +73,7 @@ export default function CreateAdminUser() {
           <h2 className="font-semibold text-xl">Edit an admin user</h2>
         </div>
         <button
-          onClick={handleAssignRole}
+          onClick={handleEditAdmin}
           type="button"
           className="bg-blue-600 text-white px-6 py-2 rounded-full"
         >
@@ -59,25 +85,19 @@ export default function CreateAdminUser() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Name"
+            value={admin?.name}
+            onChange={(e) => setAdmin({ ...admin, name: e.target.value })}
             className="w-full border p-2 rounded"
           />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="w-full border p-2 rounded"
-          />
-          <input
+
+          {/*  <input
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={admin.email}
+            onChange={(e) => setAdmin({ ...admin, email: e.target.value })}
             className="w-full border p-2 rounded"
-          />
+          /> */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

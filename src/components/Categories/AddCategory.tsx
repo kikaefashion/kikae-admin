@@ -2,7 +2,13 @@
 import { addCategory } from "@/networking/endpoints/categories/addCategory";
 import React, { useState } from "react";
 
-const AddCategory = ({ getCategories }: { getCategories: () => void }) => {
+const AddCategory = ({
+  getCategories,
+  closeModal,
+}: {
+  getCategories: () => void;
+  closeModal: () => void;
+}) => {
   const [newCategory, setNewCategory] = useState({
     name: "",
     subcategories: "",
@@ -10,6 +16,7 @@ const AddCategory = ({ getCategories }: { getCategories: () => void }) => {
   const handleAddCategory = async () => {
     await addCategory(newCategory.name, newCategory.subcategories);
     getCategories();
+    closeModal();
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -44,10 +51,7 @@ const AddCategory = ({ getCategories }: { getCategories: () => void }) => {
           >
             Save
           </button>
-          <button
-            className="border px-4 py-2 rounded"
-            //   onClick={() => setIsModalOpen(false)}
-          >
+          <button className="border px-4 py-2 rounded" onClick={closeModal}>
             Cancel
           </button>
         </div>

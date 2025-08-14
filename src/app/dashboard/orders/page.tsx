@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import FinancialActivity from "@/components/Order/FinancialActivity";
 import FeeTable from "@/components/Order/TransactionFees";
 import PayoutTable from "@/components/Order/VendorPayouts";
@@ -14,7 +16,7 @@ import { getTransactionFees } from "@/networking/endpoints/Orders/getTransaction
 import { useBoundStore } from "@/store/store";
 import type { OrderItem } from "@/types/UserOrdersTypes";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 
@@ -41,9 +43,15 @@ function FashionStore({}) {
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [filterInput, setFilterInput] = useState("");
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [date, setDate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [orderIdInput, setOrderIdInput] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  /*   const [loading, setLoading] = useState(false);
+ 
+  const [allOrders, setAllOrders] = useState<OrderItem[]>([]); */
+  const [initialLoading, setInitialLoading] = useState(true);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -61,60 +69,104 @@ function FashionStore({}) {
     { label: "Refunds issued", amount: 0 },
   ]);
 
-  // Function to get current filter parameters from URL
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node)
+      ) {
+        setFilterDropdownOpen(false);
+      }
+    };
+
+    if (filterDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [filterDropdownOpen]);
+
   const getCurrentFilters = useCallback(() => {
     const filter = searchParams.get("filter");
     const value = searchParams.get("value");
+    const startDateParam = searchParams.get("start_date");
+    const endDateParam = searchParams.get("end_date");
 
     let keyword: string | undefined;
-    let status: string | undefined;
+    let status: string[] | undefined;
     let start_date: string | undefined;
     let end_date: string | undefined;
 
-    // Handle date filter
-    if (date) {
-      start_date = date;
-      end_date = date;
+    if (startDate || startDateParam) {
+      start_date = startDate || startDateParam || undefined;
+    }
+    if (endDate || endDateParam) {
+      end_date = endDate || endDateParam || undefined;
     }
 
-    // Handle other filters
     if (filter && value) {
       switch (filter) {
-        case "order_id":
         case "keyword":
         case "items":
           keyword = value;
           break;
         case "status":
-          status = value;
+          status = value.split(",").filter((s) => s.trim());
           break;
       }
     }
 
     return { keyword, status, start_date, end_date };
-  }, [searchParams, date]);
+  }, [searchParams, startDate, endDate]);
 
-  // Function to fetch orders with current filters
+  const applyFrontendFilters = useCallback(
+    (orders: OrderItem[]) => {
+      let filteredOrders = [...orders];
+
+      // Apply Order ID filter on frontend
+      const orderIdFilter =
+        searchParams.get("filter") === "order_id"
+          ? searchParams.get("value")
+          : orderIdInput;
+      if (orderIdFilter && orderIdFilter.trim()) {
+        filteredOrders = filteredOrders.filter((order) =>
+          order.id?.toString().includes(orderIdFilter.trim())
+        );
+      }
+
+      return filteredOrders;
+    },
+    [searchParams, orderIdInput]
+  );
+
   const fetchFilteredOrders = useCallback(async () => {
-    setLoading(true);
+    //setLoading(true);
     try {
       const filters = getCurrentFilters();
+
+      const statusParam = filters.status ? filters.status.join(",") : undefined;
+
       const orders = await getAllOrders(
         filters.keyword,
         filters.start_date,
         filters.end_date,
-        filters.status
+        statusParam
       );
-      console.log({ orders, filters });
-      setOrders(orders.data);
+
+      // setAllOrders(orders.data);
+      const filteredOrders = applyFrontendFilters(orders.data);
+      setOrders(filteredOrders);
+
+      console.log({ orders: filteredOrders, filters });
     } catch (error) {
       console.error("Error fetching filtered orders:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
-  }, [getCurrentFilters]);
+  }, [getCurrentFilters, applyFrontendFilters]);
 
-  // Function to fetch financial stats
   const fetchFinancialStats = useCallback(async () => {
     try {
       const [
@@ -149,37 +201,39 @@ function FashionStore({}) {
     }
   }, []);
 
-  // Initial data fetch
   useEffect(() => {
     const fetchInitialData = async () => {
+      setInitialLoading(true);
       try {
         const transactions = await getAllTransactions();
         setOrderTransactionFees(transactions.transactions);
         await fetchFinancialStats();
-        // Fetch initial orders
         await fetchFilteredOrders();
       } catch (error) {
         console.error("Error fetching initial data:", error);
+      } finally {
+        setInitialLoading(false);
       }
     };
     fetchInitialData();
   }, [setOrderTransactionFees, fetchFinancialStats, fetchFilteredOrders]);
 
-  // Toggle status selection
-  const toggleStatus = (status: string) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
-    );
+  const selectStatus = (status: string) => {
+    setSelectedStatus(status);
   };
 
-  // Get appropriate placeholder
+  const handleOrderIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d+$/.test(value)) {
+      setOrderIdInput(value);
+    }
+  };
+
   const getFilterPlaceholder = () => {
     if (!selectedFilter) return "";
     switch (selectedFilter.toLowerCase()) {
       case "order id":
-        return "Input Order ID";
+        return "Input Order ID (numbers only)";
       case "keyword":
         return "Input Keyword";
       case "status":
@@ -191,56 +245,72 @@ function FashionStore({}) {
     }
   };
 
-  // Apply filter and update query params
   const applyFilter = async () => {
     if (!selectedFilter) return;
 
     const queryParams = new URLSearchParams(searchParams.toString());
 
     if (selectedFilter.toLowerCase() === "status") {
-      if (selectedStatuses.length === 0) return;
+      if (!selectedStatus) return;
       queryParams.set("filter", "status");
-      queryParams.set("value", selectedStatuses.join(","));
-    } else if (filterInput) {
-      const filterKey = selectedFilter.toLowerCase().replace(" ", "_");
-      queryParams.set("filter", filterKey);
-      queryParams.set("value", filterInput);
+      queryParams.set("value", selectedStatus);
+    } else if (selectedFilter.toLowerCase() === "order id") {
+      if (!orderIdInput.trim()) return;
+      queryParams.set("filter", "order_id");
+      queryParams.set("value", orderIdInput.trim());
+    } else {
+      if (!filterInput.trim()) return;
+      queryParams.set("filter", selectedFilter.toLowerCase());
+      queryParams.set("value", filterInput.trim());
+    }
+
+    setFilterDropdownOpen(false);
+
+    router.push(`?${queryParams.toString()}`);
+
+    setTimeout(() => {
+      fetchFilteredOrders();
+    }, 100);
+  };
+
+  const applyDateFilter = async () => {
+    if (!startDate && !endDate) return;
+
+    const queryParams = new URLSearchParams(searchParams.toString());
+
+    if (startDate) {
+      queryParams.set("start_date", startDate);
+    } else {
+      queryParams.delete("start_date");
+    }
+
+    if (endDate) {
+      queryParams.set("end_date", endDate);
+    } else {
+      queryParams.delete("end_date");
     }
 
     router.replace(`/dashboard/orders?${queryParams.toString()}`);
-    setFilterDropdownOpen(false);
 
-    // Immediately fetch orders with new filters
     await fetchFilteredOrders();
   };
 
-  // Apply date filter
-  const applyDateFilter = async () => {
-    if (!date) return;
-
-    const queryParams = new URLSearchParams(searchParams.toString());
-    queryParams.set("date", date);
-    router.replace(`/dashboard/orders?${queryParams.toString()}`);
-
-    // Immediately fetch orders with date filter
-    await fetchFilteredOrders();
-  };
-
-  // Reset all filters
   const resetFilters = async () => {
     setSelectedFilter(null);
     setFilterDropdownOpen(false);
     setFilterInput("");
-    setSelectedStatuses([]);
-    setDate("");
+    setOrderIdInput("");
+    setSelectedStatus("");
+    setStartDate("");
+    setEndDate("");
 
     const queryParams = new URLSearchParams(searchParams.toString());
     queryParams.delete("filter");
     queryParams.delete("value");
-    queryParams.delete("date");
+    queryParams.delete("start_date");
+    queryParams.delete("end_date");
     router.replace(`/dashboard/orders?${queryParams.toString()}`);
 
-    // Immediately fetch all orders without filters
     await fetchFilteredOrders();
   };
 
@@ -260,14 +330,27 @@ function FashionStore({}) {
           <h4>Filter by</h4>
 
           <div className="flex items-center gap-2">
-            <input
-              value={date}
-              placeholder="date"
-              type="date"
-              className="border rounded-md p-2"
-              onChange={(e) => setDate(e.target.value)}
-            />
-            {date && (
+            <div className="flex items-center gap-1">
+              <label className="text-sm text-gray-600">From:</label>
+              <input
+                value={startDate}
+                placeholder="Start date"
+                type="date"
+                className="border rounded-md p-2 text-sm"
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-1">
+              <label className="text-sm text-gray-600">To:</label>
+              <input
+                value={endDate}
+                placeholder="End date"
+                type="date"
+                className="border rounded-md p-2 text-sm"
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+            {(startDate || endDate) && (
               <button
                 onClick={applyDateFilter}
                 className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
@@ -283,6 +366,9 @@ function FashionStore({}) {
                 onClick={() => {
                   setSelectedFilter(filter);
                   setFilterDropdownOpen(true);
+                  setFilterInput("");
+                  setOrderIdInput("");
+                  setSelectedStatus("");
                 }}
                 className="px-3 py-1 border rounded-md bg-white text-sm flex items-center text-kikaeGrey"
               >
@@ -335,9 +421,11 @@ function FashionStore({}) {
         </div>
       </div>
 
-      {/* Filter Dropdown */}
       {filterDropdownOpen && selectedFilter && (
-        <div className="absolute bg-white border rounded-3xl shadow-lg mt-2 flex flex-col gap-2 p-4 pr-[7em] z-10">
+        <div
+          ref={filterDropdownRef}
+          className="absolute bg-white border rounded-3xl shadow-lg mt-2 flex flex-col gap-2 p-4 pr-[7em] z-10"
+        >
           {selectedFilter.toLowerCase() === "status" ? (
             <>
               <h4 className="font-bold mb-6">Select Order Status</h4>
@@ -345,9 +433,9 @@ function FashionStore({}) {
                 {orderStatuses.map((status) => (
                   <button
                     key={status}
-                    onClick={() => toggleStatus(status)}
+                    onClick={() => selectStatus(status)}
                     className={`px-4 py-2 border rounded-3xl ${
-                      selectedStatuses.includes(status)
+                      selectedStatus === status
                         ? "bg-blue-500 text-white"
                         : "bg-gray-100"
                     } text-sm`}
@@ -357,7 +445,23 @@ function FashionStore({}) {
                 ))}
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                *You can choose multiple Order Status
+                *You can choose only one Order Status
+              </p>
+            </>
+          ) : selectedFilter.toLowerCase() === "order id" ? (
+            <>
+              <h4 className="font-bold mb-6">{getFilterPlaceholder()}</h4>
+              <input
+                type="text"
+                placeholder={getFilterPlaceholder()}
+                className="border rounded-3xl p-2 min-w-[24rem] mb-[4rem]"
+                value={orderIdInput}
+                onChange={handleOrderIdChange}
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+              <p className="text-xs text-gray-500 -mt-12 mb-8">
+                *Only numbers are allowed for Order ID
               </p>
             </>
           ) : (
@@ -381,16 +485,12 @@ function FashionStore({}) {
         </div>
       )}
 
-      {/* Loading indicator */}
-      {loading && (
-        <div className="flex justify-center items-center py-4">
-          <div className="text-gray-500">Loading orders...</div>
-        </div>
-      )}
-
-      {/* Financial Stats */}
       {page == null && (
-        <FinancialActivity financialStats={financialStats} orders={orders} />
+        <FinancialActivity
+          isLoading={initialLoading}
+          financialStats={financialStats}
+          orders={orders}
+        />
       )}
       {page == "vendor_payouts" && <PayoutTable />}
       {page == "transaction_fees_breakdown" && <FeeTable />}

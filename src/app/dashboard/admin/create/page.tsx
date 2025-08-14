@@ -28,6 +28,7 @@ export default function CreateAdminUser() {
     setIsLoading(true);
     const result = await handleRegisterAdmin(email, password, password, name);
     setIsLoading(false);
+    router.back();
     console.log({ result });
   };
 

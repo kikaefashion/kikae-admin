@@ -38,27 +38,21 @@ const SalesMetrics = ({
         <strong>Revenue Generated:</strong> T-shirt and sleeves (400 Sales)
       </p>
 
-      <table className="w-full text-black">
+      <table className="w-full text-black border-none  ">
         <thead>
-          <tr className="">
-            <th className="border border-gray-300 p-2">Products</th>
-            <th className="border border-gray-300 p-2">Views</th>
-            <th className="border border-gray-300 p-2">Sales</th>
+          <tr className="flex space-x-4 text-left">
+            <th className="p-2 bg-white border-md flex-1">Products</th>
+            <th className="p-2 bg-white border-md flex-1">Views</th>
+            <th className="p-2 bg-white border-md flex-1">Sales</th>
           </tr>
         </thead>
         <tbody>
           {salesData &&
             salesData.map((product, index: number) => (
-              <tr key={index} className="text-center">
-                <td className="border border-gray-300 p-2">
-                  {product.product_name}
-                </td>
-                <td className="border border-gray-300 p-2">
-                  {product.units_sold}
-                </td>
-                <td className="border border-gray-300 p-2">
-                  {product.total_revenue}
-                </td>
+              <tr key={index} className="text-center flex space-x-4">
+                <td className="p-2 flex-1">{product.product_name}</td>
+                <td className="p-2 flex-1">{product.units_sold}</td>
+                <td className="p-2 flex-1">{product.total_revenue}</td>
               </tr>
             ))}
         </tbody>

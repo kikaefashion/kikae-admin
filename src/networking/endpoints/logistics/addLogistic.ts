@@ -3,8 +3,10 @@ import { baseUrl } from "@/networking/apiUrl";
 export const addLogistic = async (
   name: string,
   email: string,
-  phone: string
+  phone: string,
   //address: string
+  extra_pickup_increment: number,
+  extra_weight_fee: number
 ) => {
   try {
     const response = await fetch(`${baseUrl}/addLogistic`, {
@@ -18,6 +20,8 @@ export const addLogistic = async (
         email,
         phone,
         address: "kikae",
+        extra_pickup_increment,
+        extra_weight_fee,
       }),
     });
 

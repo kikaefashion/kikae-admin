@@ -4,7 +4,10 @@ export const updateLogistic = async (
   id: string | number,
   name: string,
   email: string,
-  phone: string
+  phone: string,
+  //  address: string,
+  extra_pickup_increment: number,
+  extra_weight_fee: number
 ) => {
   try {
     const response = await fetch(`${baseUrl}/updateLogistic`, {
@@ -19,16 +22,19 @@ export const updateLogistic = async (
         email,
         phone,
         address: "kikae",
+        extra_pickup_increment,
+        extra_weight_fee,
       }),
     });
     const result = await response.json();
 
     if (!response.ok) {
-      alert("failed to update logistic destination");
       console.log({ result });
+      alert("failed to update logistic destination");
+
       return;
     }
-
+    console.log({ result });
     alert("logistic destination updated!");
     return;
   } catch (error) {

@@ -21,6 +21,7 @@ const UserProfile = ({
   const userOrders = useBoundStore((state) => state.userOrders);
   const search = useSearchParams().get("details");
   const userCart = useBoundStore((state) => state.userCart);
+  const ongoingDelivery = useBoundStore((state) => state.ongoingDelivery);
 
   const user = {
     firstName: userDetails?.fname,
@@ -50,7 +51,7 @@ const UserProfile = ({
       },
       {
         label: "Ongoing delivery",
-        count: 4,
+        count: ongoingDelivery?.length,
         link: "View all ongoing delivery",
         hrefLink: "delivery",
       },

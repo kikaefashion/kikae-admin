@@ -1,5 +1,5 @@
 export type TransactionFeeType = {
-  date: string;
+  created_at: string;
   order_id: string;
   vendor: string;
   type: string;

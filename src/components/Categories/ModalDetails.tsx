@@ -1,19 +1,40 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import AddCategory from "./AddCategory";
 import EditCategory from "./EditCategory";
 import DeleteCategory from "./DeleteCategory";
 
-const ModalDetails = ({ getCategories }: { getCategories: () => void }) => {
+const ModalDetails = ({
+  getCategories,
+}: //  closeModal,
+{
+  getCategories: () => void;
+  //  closeModal: () => void;
+}) => {
   const action = useSearchParams().get("action");
+  const router = useRouter();
+
+  const handleCloseModal = () => {
+    router.back();
+  };
 
   if (action == "add") {
-    return <AddCategory getCategories={getCategories} />;
+    return (
+      <AddCategory
+        closeModal={handleCloseModal}
+        getCategories={getCategories}
+      />
+    );
   } else if (action == "edit") {
     return <EditCategory getCategories={getCategories} />;
   } else if (action == "delete") {
-    return <DeleteCategory getCategories={getCategories} />;
+    return (
+      <DeleteCategory
+        closeModal={handleCloseModal}
+        getCategories={getCategories}
+      />
+    );
   }
   return null;
 };

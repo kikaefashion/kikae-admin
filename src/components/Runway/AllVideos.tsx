@@ -1,21 +1,10 @@
 "use client";
 
+import { deleteRunwayVideo } from "@/networking/endpoints/runway/deleteRunwayVideo";
 import { getRunwayVideos } from "@/networking/endpoints/runway/getRunwayVideos";
 import { useBoundStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-/* const data = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  name: "Black jacket with s...",
-  description: "This shirt isn't just comfortable, it's practically...",
-  items: [
-    "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-    "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-    "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-    "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  ],
-})); */
 
 export default function AllVideos() {
   const [search, setSearch] = useState("");
@@ -35,8 +24,14 @@ export default function AllVideos() {
     handleGetAllRunwayVideos();
   }, [setAllRunwayVideos]);
 
-  console.log({ allRunwayVideos });
-
+  const handleDeletRunwayVideo = async (id: number) => {
+    const result = await deleteRunwayVideo(id);
+    if (result) {
+      // Optionally, you can refetch the videos or update the state
+      const updatedVideos = allRunwayVideos.filter((video) => video.id !== id);
+      setAllRunwayVideos(updatedVideos);
+    }
+  };
   return (
     <div className="p-6 w-full text-black">
       <div className="mb-4">
@@ -102,7 +97,12 @@ export default function AllVideos() {
                   ))}
 
                   <td className="p-2">
-                    <button className="text-red-500">Delete</button>
+                    <button
+                      onClick={() => handleDeletRunwayVideo(row.id)}
+                      className="text-red-500"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );

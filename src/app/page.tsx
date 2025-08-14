@@ -68,7 +68,7 @@ const Login = () => {
         {" "}
         To access the Kikae Dashboard
       </p>
-      <h1 className="text-black text-2xl">Login to your account</h1>
+      <h1 className="text-black text-2xl font-bold">Login to your account</h1>
       <form
         className="bg-white flex flex-col w-494 border border-slate-200 pt-10 px-6 rounded-3xl mt-6 min-h-[21.125rem]"
         onSubmit={handleSubmit(onSubmit)}

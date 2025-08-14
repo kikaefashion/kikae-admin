@@ -1,29 +1,29 @@
 import type { Metadata } from "next";
 /* import localFont from "next/font/local"; */
-import { DM_Sans, Open_Sans } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import ToastComponent from "@/components/ToastComponent";
 
-const dm_sans = DM_Sans({
+/* const dm_sans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-dmSansBold",
   weight: "700",
-});
+}); */
 
 const openSans = Open_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-openSansRegular",
-  weight: "400",
+
+  weight: ["400", "700"],
 });
 
-const dmSans = DM_Sans({
+/* const dmSans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-dmSans",
   weight: "400",
-});
+}); */
 /* const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html className={openSans.className} lang="en">
       <head>
         <link
           rel="icon"
@@ -55,9 +55,7 @@ export default function RootLayout({
           // sizes="<generated>"
         />
       </head>
-      <body
-        className={`${openSans.variable} ${dm_sans.variable} ${dmSans.variable}  antialiased bg-lightWhite`}
-      >
+      <body className={` antialiased bg-lightWhite`}>
         <ToastComponent />
 
         {children}

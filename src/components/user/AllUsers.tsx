@@ -1,23 +1,32 @@
 "use client";
 import React from "react";
 //import { users } from "@/app/data"; // Importing dummy data
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useBoundStore } from "@/store/store";
 import { mediaUrlPrefix } from "@/networking/apiUrl";
+import { deactivateUser } from "@/networking/endpoints/users/deactivateUser";
 
 const Users = () => {
   const router = useRouter();
 
-  const type = useSearchParams().get("type");
+  //  const type = useSearchParams().get("type");
 
   const users = useBoundStore((state) => state.allUsers);
+  const setUsers = useBoundStore((state) => state.setAllUsers);
 
   //const page = useSearchParams().get("page");
 
   const goToUserPage = (id: string) => {
     router.push(`/dashboard/users/${id}`);
   };
-  console.log({ type });
+  const handleDeleteUser = async (id: string, status: 1 | 0) => {
+    const result = await deactivateUser(id, status);
+
+    if (result) {
+      const filteredUsers = users.filter((item) => item.id != id);
+      setUsers(filteredUsers);
+    }
+  };
   return (
     <div className="pt-6 pr-6">
       <div className="p-4 shadow-lg rounded-3xl text-black ">
@@ -53,7 +62,10 @@ const Users = () => {
                     />
                   </td>
                   <td className="p-3">
-                    <button className="text-red-600 hover:underline">
+                    <button
+                      onClick={() => handleDeleteUser(user?.id, 1)}
+                      className="text-red-600 hover:underline"
+                    >
                       Deactivate
                     </button>
                   </td>

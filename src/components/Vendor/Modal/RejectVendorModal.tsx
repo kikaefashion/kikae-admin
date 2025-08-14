@@ -1,5 +1,6 @@
 "use client";
 import { rejectVendorStore } from "@/networking/endpoints/vendors/rejectVendor";
+import { useBoundStore } from "@/store/store";
 import React, { useState } from "react";
 
 const RejectVendor = ({
@@ -10,9 +11,14 @@ const RejectVendor = ({
   setIsVisible: (value: boolean) => void;
 }) => {
   const [reason, setReason] = useState("");
+  const pendingVendors = useBoundStore((state) => state.pendingVendors);
+  const setPendingVendors = useBoundStore((state) => state.setPendingVendors);
 
   const handleRejectVendor = async () => {
-    await rejectVendorStore(storeId);
+    const result = await rejectVendorStore(storeId);
+
+    if (!result) return;
+    setPendingVendors(pendingVendors.filter((vendor) => vendor.id !== storeId));
 
     setIsVisible(false);
   };

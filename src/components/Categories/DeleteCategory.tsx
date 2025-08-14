@@ -2,11 +2,18 @@ import { deleteCategory } from "@/networking/endpoints/categories/deleteCategory
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
-const DeleteCategory = ({ getCategories }: { getCategories: () => void }) => {
+const DeleteCategory = ({
+  getCategories,
+  closeModal,
+}: {
+  getCategories: () => void;
+  closeModal: () => void;
+}) => {
   const id = useSearchParams().get("id");
   const handleDeleteCategory = async () => {
     await deleteCategory(Number(id));
     getCategories();
+    closeModal();
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center text-black">
@@ -22,10 +29,7 @@ const DeleteCategory = ({ getCategories }: { getCategories: () => void }) => {
           >
             Yes
           </button>
-          <button
-            className="border px-4 py-2 rounded"
-            //   onClick={() => setIsModalOpen(false)}
-          >
+          <button className="border px-4 py-2 rounded" onClick={closeModal}>
             No
           </button>
         </div>

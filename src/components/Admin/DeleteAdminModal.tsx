@@ -7,9 +7,11 @@ import Loader from "../Loader";
 const DeleteUserModal = ({
   id,
   setIsVisible,
+  handleGetAllAdmins,
 }: {
   id: string;
   setIsVisible: (value: boolean) => void;
+  handleGetAllAdmins: () => void;
 }) => {
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +19,7 @@ const DeleteUserModal = ({
   const handleDeleteUser = async () => {
     setIsLoading(true);
     await deleteAdmin(id);
+    handleGetAllAdmins();
     setIsLoading(false);
 
     setIsVisible(false);

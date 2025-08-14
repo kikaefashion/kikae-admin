@@ -59,10 +59,10 @@ const ProductDetails = () => {
   return (
     <div className="p-6 max-w-5xl mx-auto rounded-lg ">
       <MyModal close={() => setOpenModal(false)} isVisible={openModal}>
-        <CommentModal />
+        <CommentModal close={() => setOpenModal(false)} />
       </MyModal>
       <MyModal isVisible={page == "analytics"} close={() => router.back()}>
-        <Analytics />
+        <Analytics productId={params.id} />
       </MyModal>
 
       {/* Header Section */}
@@ -80,7 +80,9 @@ const ProductDetails = () => {
 
           <button
             onClick={() => {
-              router.push(`/dashboard/products/1?type=${type}&&page=analytics`);
+              router.push(
+                `/dashboard/products/${params.id}?type=${type}&&page=analytics`
+              );
             }}
             className="py-1 px-6 bg-white rounded-2xl border border-black/25 justify-center items-center inline-flex"
           >

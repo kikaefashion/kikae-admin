@@ -91,7 +91,7 @@ const OrdersGrid = () => {
                 Order {order.id}
               </p>
               <h3 className="mt-1 text-black">{order.name}</h3>
-              <p className="text-kikaeGrey">{order.price}</p>
+              <p className="text-kikaeGrey">₦{order.price}</p>
               <p className="text-kikaeGrey text-sm">{order.product.thrift}</p>
             </div>
           ))

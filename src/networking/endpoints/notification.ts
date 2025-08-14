@@ -24,6 +24,7 @@ export const sendGeneralNotiification = async (title: string, body: string) => {
 
   if (!response.ok) {
     alert("could not send notification");
+    return;
   }
   alert("notification sent!");
 

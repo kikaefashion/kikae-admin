@@ -9,14 +9,18 @@ import { useState } from "react";
 } */
 
 export default function AddLogisticsProvider({
+  handleGetLogistic,
   closeModal,
 }: {
+  handleGetLogistic: () => void;
   closeModal: () => void;
 }) {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [extraPickupIncrement, setExtraPickupIncrement] = useState("");
+  const [extraWeightFee, setExtraWeightFee] = useState("");
   /*   const [cities, setCities] = useState<City[]>([
     { name: "Ikeja", fee: "2500" },
     { name: "Ikorodu", fee: "3000" },
@@ -43,7 +47,15 @@ export default function AddLogisticsProvider({
 
   const handleAddLogistic = async () => {
     setIsLoading(true);
-    await addLogistic(name, email, number);
+    await addLogistic(
+      name,
+      email,
+      number,
+      Number(extraPickupIncrement) || 0,
+      Number(extraWeightFee || 0)
+    );
+    handleGetLogistic();
+    closeModal();
     setIsLoading(false);
   };
   return (
@@ -125,6 +137,22 @@ export default function AddLogisticsProvider({
         placeholder="Company Email"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
+      <div className="flex space-x-2 mb-2 items-center">
+        <input
+          type="number"
+          value={extraPickupIncrement}
+          onChange={(e) => setExtraPickupIncrement(e.target.value)}
+          placeholder="Extra Pickup Increment (₦)"
+          className="flex-1 border p-3.5 rounded-3xl w-[40%]"
+        />
+        <input
+          type="number"
+          value={extraWeightFee}
+          onChange={(e) => setExtraWeightFee(e.target.value)}
+          placeholder="Extra Weight Fee (₦)"
+          className="flex-1 border p-3.5 rounded-3xl w-[40%]"
+        />
+      </div>
 
       <button
         onClick={handleAddLogistic}

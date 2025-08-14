@@ -25,14 +25,14 @@ function CategoriesTable() {
     {
       id: number;
       name: string;
-      description: string;
+      //  description: string;
     }[]
   >([]);
   const [subcategories, setSubcategories] = useState<
     {
       id: number;
       name: string;
-      description: string;
+      // description: string;
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,7 @@ function CategoriesTable() {
   }, []);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 ">
       <MyModal
         isVisible={action == "add" || action == "edit" || action == "delete"}
         close={() => router.back()}
@@ -96,7 +96,7 @@ function CategoriesTable() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <Link href={`?action=add`} className="text-blue-500">
-          Add new {activeView.slice(0, -1)}
+          Add new {activeView}
         </Link>
       </div>
 
@@ -130,9 +130,9 @@ function CategoriesTable() {
             <th className="p-2 text-left">
               {activeView === "categories" ? "Category" : "Subcategory"}
             </th>
-            {activeView === "subcategories" && (
+            {/* {activeView === "subcategories" && (
               <th className="p-2 text-left">Parent Category</th>
-            )}
+            )} */}
             <th className="p-2 text-right">No. of items</th>
             <th className="p-2 text-center">Actions</th>
           </tr>
@@ -181,7 +181,7 @@ function CategoriesTable() {
                   {subcat.name}
                 </td>
                 <td className="p-2 text-gray-600"></td>
-                <td className="p-2 text-right"></td>
+                {/* <td className="p-2 text-right"></td> */}
                 <td className="p-2 text-center space-x-2">
                   <Link
                     href={`?action=edit&&id=${subcat.id}`}

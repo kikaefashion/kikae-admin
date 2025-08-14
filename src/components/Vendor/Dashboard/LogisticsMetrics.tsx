@@ -28,22 +28,22 @@ const LogisticsMetrics = () => {
         <strong>Revenue Generated:</strong> T-shirt and sleeves (400 Sales)
       </p>
 
-      <table className="w-full border-collapse border border-gray-200 text-black">
+      <table className="w-full text-black border-none">
         <thead>
-          <tr>
-            <th className="border border-gray-300 p-2">Order id</th>
-            <th className="border border-gray-300 p-2">Products</th>
-            <th className="border border-gray-300 p-2">Status</th>
-            <th className="border border-gray-300 p-2">Reason</th>
+          <tr className="flex space-x-4 text-left">
+            <th className="p-2 bg-white border-md flex-1">Order id</th>
+            <th className="p-2 bg-white border-md flex-1">Products</th>
+            <th className="p-2 bg-white border-md flex-1">Status</th>
+            <th className="p-2 bg-white border-md flex-1">Reason</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
-            <tr key={index} className="text-center">
-              <td className="border border-gray-300 p-2">{product.order_id}</td>
-              <td className="border border-gray-300 p-2">{product.name}</td>
-              <td className="border border-gray-300 p-2">{product.reason}</td>
-              <td className="border border-gray-300 p-2">{product.status}</td>
+            <tr key={index} className="text-center flex space-x-4">
+              <td className="p-2 flex-1">{product.order_id}</td>
+              <td className="p-2 flex-1">{product.name}</td>
+              <td className="p-2 flex-1">{product.reason}</td>
+              <td className="p-2 flex-1">{product.status}</td>
             </tr>
           ))}
         </tbody>

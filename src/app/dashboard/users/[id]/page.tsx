@@ -10,6 +10,7 @@ import { useParams } from "next/navigation";
 import { useBoundStore } from "@/store/store";
 import { getUserOrders } from "@/networking/endpoints/users/getUserOrders";
 import { getUserCart } from "@/networking/endpoints/users/getUserCart";
+import { getOngoingDelivery } from "@/networking/endpoints/users/getOngoingDeliveries";
 
 const Page = () => {
   const params = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ const Page = () => {
   const setUserDetails = useBoundStore((state) => state.setUserDetails);
   const setUserOrders = useBoundStore((state) => state.setUserOrders);
   const setUserCart = useBoundStore((state) => state.setUserCart);
+  const setOngoingDelivery = useBoundStore((state) => state.setOngoingDelivery);
 
   useEffect(() => {
     const handleGetUser = async () => {
@@ -27,9 +29,13 @@ const Page = () => {
         if (result) {
           const userOrdersResult = await getUserOrders(result.id);
           const userCartResult = await getUserCart(result.id);
+          const ongoingDeliveryResult = await getOngoingDelivery(result.id);
+
+          console.log({ ongoingDeliveryResult });
 
           setUserOrders(userOrdersResult.data);
           setUserCart(userCartResult.data);
+          setOngoingDelivery(ongoingDeliveryResult.data);
         }
 
         if (!result) return;

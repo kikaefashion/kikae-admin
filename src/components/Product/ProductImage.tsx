@@ -64,7 +64,7 @@ export default function ImageGallery({
             onClick={() => handleImageClick(0)}
           >
             <img
-              src={visibleImages[0].url || "/placeholder.svg"}
+              src={mediaUrlPrefix + visibleImages[0].url || "/placeholder.svg"}
               alt={visibleImages[0].title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
             />
@@ -158,7 +158,10 @@ export default function ImageGallery({
             {/* Main image */}
             <div className="relative aspect-video bg-black">
               <img
-                src={images[currentImageIndex]?.url || "/placeholder.svg"}
+                src={
+                  mediaUrlPrefix + images[currentImageIndex]?.url ||
+                  "/placeholder.svg"
+                }
                 alt={images[currentImageIndex]?.title}
                 className="w-full h-full object-contain"
               />

@@ -59,13 +59,19 @@ export default function LogisticsTable() {
       logistics.name.toLowerCase().includes(search.toLowerCase())
     );
 
+  const handleGetLogistics = async () => {
+    const data = await getLogistics();
+    setLogistics(data.data);
+  };
+
   useEffect(() => {
-    const fetchLogistics = async () => {
-      const data = await getLogistics();
-      setLogistics(data.data);
-    };
-    fetchLogistics();
+    handleGetLogistics();
   }, []);
+
+  const handleRemoveLogistic = async (logistic_id: number) => {
+    removeLogistic(logistic_id);
+    handleGetLogistics();
+  };
 
   return (
     <div className="p-6 ">
@@ -77,7 +83,10 @@ export default function LogisticsTable() {
         }
         close={() => router.back()}
       >
-        <Index closeModal={() => router.back()} />
+        <Index
+          handleGetLogistic={handleGetLogistics}
+          closeModal={() => router.back()}
+        />
       </MyModal>
       <div className="flex justify-between items-center mb-4">
         <input
@@ -142,7 +151,7 @@ export default function LogisticsTable() {
                       Edit
                     </Link>
                     <button
-                      onClick={() => removeLogistic(logistics.id)}
+                      onClick={() => handleRemoveLogistic(logistics.id)}
                       className="text-kikaeGrey "
                     >
                       Delete

@@ -30,6 +30,13 @@ const ApprovedVendors = () => {
     handleGetApprovedStores();
   }, [setApprovedVendors]);
 
+  const handleDeactivateVendorStore = async (id: string) => {
+    await deactivateVendorStore(id);
+    const approvedStoresResult = await getApprovedStores();
+    if (approvedStoresResult) {
+      setApprovedVendors(approvedStoresResult);
+    }
+  };
   return (
     <div className="p-6 min-h-screen text-black">
       <div className="bg-white shadow rounded-xl overflow-hidden">
@@ -59,7 +66,7 @@ const ApprovedVendors = () => {
                   <td className="px-6 py-4">{biz.website}</td>
                   <td className="px-6 py-4 ">{biz.address}</td>
                   <td
-                    onClick={() => deactivateVendorStore(biz.id)}
+                    onClick={() => handleDeactivateVendorStore(biz.id)}
                     className="px-6 py-4 text-kikaeGrey underline cursor-pointer"
                   >
                     Deactivate

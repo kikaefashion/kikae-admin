@@ -21,7 +21,7 @@ export const removeLogistic = async (id: string | number) => {
     }
 
     alert("logistic  deleted!");
-    return;
+    return true;
   } catch (error) {
     console.log(error);
   }

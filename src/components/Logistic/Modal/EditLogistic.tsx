@@ -12,24 +12,41 @@ import { stateType } from "@/types/stateType";
 import { Check } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { IoTrashBin } from "react-icons/io5";
 
-const EditLogisticsProvider = ({ closeModal }: { closeModal: () => void }) => {
+const EditLogisticsProvider = ({
+  closeModal,
+  handleGetLogistic,
+}: {
+  closeModal: () => void;
+  handleGetLogistic: () => void;
+}) => {
   return (
     <Suspense>
-      <EditLogistics closeModal={closeModal} />
+      <EditLogistics
+        closeModal={closeModal}
+        handleGetLogistic={handleGetLogistic}
+      />
     </Suspense>
   );
 };
 
-function EditLogistics({ closeModal }: { closeModal: () => void }) {
+function EditLogistics({
+  closeModal,
+  handleGetLogistic,
+}: {
+  closeModal: () => void;
+  handleGetLogistic: () => void;
+}) {
   const logistic_id = useSearchParams().get("logistic");
-  const [logistic, setLogistic] = useState<LogisticsType>();
-  const [name, setName] = useState(logistic?.name);
+  const [logistic, setLogistic] = useState<LogisticsType | null>(null);
+  /*   const [name, setName] = useState(logistic?.name);
   const [number, setNumber] = useState(logistic?.phone);
-  const [email, setEmail] = useState(logistic?.email);
+  const [email, setEmail] = useState(logistic?.email); */
   const [states, setStates] = useState<stateType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLogisticLoading, setIsLogisticLoading] = useState(true);
+
   // const [destinations, setDestinations] = useState<Destination[]>([
   //   { name: "Ikeja", fee: "2500" },
   //   { name: "Ikorodu", fee: "3000" },
@@ -83,9 +100,25 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
   };
 
   const handleUpdateLogistic = async () => {
-    if (!logistic?.id || !name || !email || !number) return;
+    // console.log({ logistic, name, email, number });
+    if (
+      !logistic?.id ||
+      !logistic?.name ||
+      !logistic?.email ||
+      !logistic?.phone
+    )
+      return;
     setIsLoading(true);
-    await updateLogistic(logistic?.id, name, email, number);
+    await updateLogistic(
+      logistic?.id,
+      logistic?.name,
+      logistic?.email,
+      logistic?.phone,
+      logistic?.extra_pickup_increment,
+      logistic?.extra_weight_fee
+    );
+    handleGetLogistic();
+    closeModal();
     setIsLoading(false);
   };
 
@@ -116,7 +149,14 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
     updateLogisticDestination(id, destination_id, area, cost, state_id);
   };
 
-  if (isLogisticLoading) return <div>Loading..</div>;
+  if (isLogisticLoading) return <Loader />;
+  if (!logistic) {
+    return (
+      <div className="text-black">
+        <h4>Failed to get logistic details</h4>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -130,10 +170,11 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
         type="text"
         placeholder="Company name"
         className="w-full border p-3.5 rounded-3xl mb-3"
-        value={name}
+        value={logistic?.name || ""}
         defaultValue={logistic?.name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => setLogistic({ ...logistic, name: e.target.value })}
       />
+
       {/*       <select className="w-full border p-3.5 rounded-3xl mb-3">
         <option>Delivering from (State)</option>
         <option>Lagos</option>
@@ -203,12 +244,12 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
             placeholder="Fee"
             className="w-[18%] border p-6 rounded"
           />
-          <button
-            className="text-red-500"
+
+          <IoTrashBin
+            className="cursor-pointer"
             onClick={() => removeDestination(index, destination.id)}
-          >
-            ✖
-          </button>
+          />
+
           <button
             className="text-kikaeBlue mb-3"
             onClick={() =>
@@ -232,8 +273,8 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
 
       <input
         defaultValue={logistic?.phone}
-        value={number}
-        onChange={(e) => setNumber(e.target.value)}
+        value={logistic?.phone || ""}
+        onChange={(e) => setLogistic({ ...logistic, phone: e.target.value })}
         type="text"
         placeholder="Company Contact Number"
         className="w-full border p-3.5 rounded-3xl mb-3"
@@ -245,12 +286,38 @@ function EditLogistics({ closeModal }: { closeModal: () => void }) {
       /> */}
       <input
         defaultValue={logistic?.email}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={logistic?.email || ""}
+        onChange={(e) => setLogistic({ ...logistic, email: e.target.value })}
         type="email"
         placeholder="Company Email"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
+      <div className="flex space-x-2 mb-2 items-center">
+        <input
+          type="number"
+          value={logistic?.extra_pickup_increment}
+          onChange={(e) =>
+            setLogistic({
+              ...logistic,
+              extra_pickup_increment: Number(e.target.value),
+            })
+          }
+          placeholder="Extra Pickup Increment (₦)"
+          className="flex-1 border p-3.5 rounded-3xl w-[40%]"
+        />
+        <input
+          type="number"
+          value={logistic.extra_weight_fee}
+          onChange={(e) =>
+            setLogistic({
+              ...logistic,
+              extra_weight_fee: Number(e.target.value),
+            })
+          }
+          placeholder="Extra Weight Fee (₦)"
+          className="flex-1 border p-3.5 rounded-3xl w-[40%]"
+        />
+      </div>
       <button
         onClick={handleUpdateLogistic}
         className="w-full bg-kikaeBlue text-white p-3.5 rounded-3xl mb-2"

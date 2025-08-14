@@ -1,22 +1,62 @@
 import { ArrowBack } from "@/assets/ArrowBack";
+import { getProductAnalytics } from "@/networking/endpoints/products/getProductAnalytics";
+import { ProductAnalytics } from "@/types/productAnalytics";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const purchases = [
-  { month: "JANUARY", item: "Long-sleeve crop top shirts", price: 20255 },
-  { month: "JANUARY", item: "Long-sleeve crop top shirts", price: 20255 },
-  { month: "FEBRUARY", item: "Long-sleeve crop top shirts", price: 20255 },
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-const Analytics = () => {
-  const [selectedMonth, setSelectedMonth] = useState("February");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const filteredPurchases = purchases.filter(
-    (p) => p.month.toLowerCase() === selectedMonth.toLowerCase()
+const Analytics = ({ productId }: { productId: string }) => {
+  const [selectedMonth, setSelectedMonth] = useState(
+    months[new Date().getMonth()]
   );
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [productAnalytics, setProductAnalytics] = useState<ProductAnalytics>();
+  const [showAllPurchases, setShowAllPurchases] = useState(false);
+
+  // Filter purchases by selected month
+  const filteredPurchases = productAnalytics?.latest_purchases.filter((p) => {
+    const purchaseDate = new Date(p.created_at);
+    const purchaseMonth = months[purchaseDate.getMonth()];
+    return purchaseMonth.toLowerCase() === selectedMonth.toLowerCase();
+  });
+
+  // Determine which purchases to display
+  const displayedPurchases = showAllPurchases
+    ? filteredPurchases
+    : filteredPurchases?.slice(0, 3);
+
   const type = useSearchParams().get("type");
   const router = useRouter();
+
+  useEffect(() => {
+    const handleGetAnalytics = async () => {
+      const result = await getProductAnalytics(productId);
+      setProductAnalytics(result.data);
+    };
+    if (productId) {
+      handleGetAnalytics();
+    }
+  }, [productId]);
+
+  // Reset showAllPurchases when month changes
+  useEffect(() => {
+    setShowAllPurchases(false);
+  }, [selectedMonth]);
+
   return (
     <div className="p-6 space-y-6 max-w-3xl mx-auto text-black">
       <div className="flex items-center justify-between">
@@ -53,7 +93,7 @@ const Analytics = () => {
           </button>
           {dropdownOpen && (
             <div className="absolute z-10 mt-2 w-32 bg-white border rounded-md shadow-lg">
-              {["January", "February", "March"].map((month) => (
+              {months.map((month) => (
                 <div
                   key={month}
                   onClick={() => {
@@ -73,15 +113,21 @@ const Analytics = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-xl shadow">
           <p className="text-sm text-kikaeBlue">TOTAL SALES</p>
-          <p className="text-lg font-semibold">₦1,500,000</p>
+          <p className="text-lg font-semibold">
+            {productAnalytics?.total_revenue}
+          </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow">
           <p className="text-sm text-kikaeBlue">TOTAL ORDERS RECEIVED</p>
-          <p className="text-lg font-semibold">804</p>
+          <p className="text-lg font-semibold">
+            {productAnalytics?.total_orders}
+          </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow">
           <p className="text-sm text-kikaeBlue">AVERAGE VALUE PER ORDER</p>
-          <p className="text-lg font-semibold">₦23,000</p>
+          <p className="text-lg font-semibold">
+            ₦{productAnalytics?.average_order_value}
+          </p>
         </div>
       </div>
 
@@ -90,22 +136,37 @@ const Analytics = () => {
           Individual {type == "makeup" ? "Bookings" : "Purchases"}
         </h3>
         <div className="space-y-4">
-          {filteredPurchases.map((purchase, index) => (
-            <div
-              key={index}
-              className="bg-white p-4 rounded-xl shadow space-y-1"
-            >
-              <p className="text-sm text-kikaeBlue">{purchase.month}</p>
-              <p className="text-sm">{purchase.item}</p>
-              <p className="text-lg font-semibold">
-                ₦{purchase.price.toLocaleString()}
-              </p>
-            </div>
-          ))}
+          {displayedPurchases?.length ? (
+            displayedPurchases.map((purchase, index) => (
+              <div
+                key={index}
+                className="bg-white p-4 rounded-xl shadow space-y-1"
+              >
+                <p className="text-sm text-kikaeBlue">
+                  {months[new Date(purchase.created_at).getMonth()]}
+                </p>
+                <p className="text-sm">{purchase.name}</p>
+                <p className="text-lg font-semibold">
+                  ₦{Number(purchase.price).toLocaleString()}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-center py-4 text-gray-500">
+              No purchases found for {selectedMonth}
+            </p>
+          )}
         </div>
-        <button className="mt-4 text-blue-600 hover:underline">
-          Load more
-        </button>
+        {filteredPurchases &&
+          filteredPurchases.length > 3 &&
+          !showAllPurchases && (
+            <button
+              onClick={() => setShowAllPurchases(true)}
+              className="mt-4 text-blue-600 hover:underline"
+            >
+              Load more ({filteredPurchases.length - 3} more)
+            </button>
+          )}
       </div>
     </div>
   );

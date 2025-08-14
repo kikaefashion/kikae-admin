@@ -24,7 +24,7 @@ const VendorOrders = ({ storeOrders }: { storeOrders: OrderItem[] }) => {
     return <h4>No Product has been uploaded to this store</h4>;
   }
   return (
-    <div className="flex gap-6 mt-6">
+    <div className="grid grid-cols-3 gap-6 mt-6">
       {storeOrders?.length !== 0 &&
         storeOrders?.map((item) => (
           <div
@@ -41,22 +41,28 @@ const VendorOrders = ({ storeOrders }: { storeOrders: OrderItem[] }) => {
               />
             </div>
             <h2 className="text-blue-600 text-sm font-semibold mb-1">
-              Long Sleeve T-Shirts
+              {item.product.name}
             </h2>
-            <p className="text-gray-500 text-xs">Ajah, Lagos - ₦60,000</p>
+            <p className="text-gray-500 text-xs">
+              {item.city}, {item.state} - {item.price?.toLocaleString()}
+            </p>
             <div className="text-sm mt-2">
+              {item.color && (
+                <p>
+                  <span className="font-semibold">Colour:</span> {item.color}
+                </p>
+              )}
+              {item.size && (
+                <p>
+                  <span className="font-semibold">Size:</span> {item.size}
+                </p>
+              )}
               <p>
-                <span className="font-semibold">Colour:</span> Blue
-              </p>
-              <p>
-                <span className="font-semibold">Size:</span> XXL
-              </p>
-              <p>
-                <span className="font-semibold">Quantity:</span> 1
+                <span className="font-semibold">Quantity:</span> {item.units}
               </p>
             </div>
             <button className="mt-3 w-full bg-blue-600 text-white py-2 rounded-3xl text-sm font-semibold hover:bg-blue-700 transition">
-              Ready for delivery
+              {item.status}
             </button>
           </div>
         ))}

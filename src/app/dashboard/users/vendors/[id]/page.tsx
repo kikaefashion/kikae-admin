@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { Arrow } from "@/assets/Arrow";
-import { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 
 import { getStore } from "@/networking/endpoints/vendors/getStore";
 import { mediaUrlPrefix } from "@/networking/apiUrl";
@@ -13,6 +13,9 @@ import StoreContent from "@/components/Vendor/StoreContent";
 import { useBoundStore } from "@/store/store";
 import MyModal from "@/components/Modal/Modal";
 import DeleteVendorModal from "@/components/Vendor/Modal/DeleteVendorModal";
+import Loader from "@/utils/Loader";
+import { getStoreFollowers } from "@/networking/endpoints/vendors/getStoreFollowers";
+import { getStoreLikes } from "@/networking/endpoints/vendors/getStoreLikes";
 
 const tabs = ["products", "runway", "dashboard", "bank details", "orders"];
 
@@ -34,18 +37,36 @@ function VendorStore() {
   const setStore = useBoundStore((state) => state.setVendorDetails);
   const [isDeleteVendorModalVisible, setIsDeleteVendorModalVisible] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [storeFollowers, setStoreFollowers] = React.useState([]);
+  const [storeLikes, setStoreLikes] = React.useState([]);
 
   useEffect(() => {
     const handleGetStore = async () => {
-      const result = await getStore(params.id);
+      try {
+        const result = await getStore(params.id);
+        const storeFollowersResult = await getStoreFollowers(store?.id);
 
-      if (result) {
-        setStore(result.data);
+        const storeLikesResult = await getStoreLikes(store?.id);
+
+        if (result) {
+          setStore(result.data);
+          setStoreFollowers(storeFollowersResult.data);
+          setStoreLikes(storeLikesResult.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch store details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     handleGetStore();
   }, [params.id, setStore]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   if (!store) {
     return (
@@ -71,7 +92,7 @@ function VendorStore() {
             User details
           </h4>
 
-          <button
+          {/* <button
             onClick={() => {
               // router.push(`/dashboard/users/audit_trail/${params.id}`);
             }}
@@ -82,7 +103,7 @@ function VendorStore() {
                 View audit trail
               </div>
             </div>
-          </button>
+          </button> */}
         </div>
 
         <div className=" flex-col justify-center items-end gap-6 inline-flex">
@@ -106,20 +127,24 @@ function VendorStore() {
       {/* Profile Image and Details */}
       <div className="flex flex-col gap-10">
         <div className="relative">
-          <Image
-            src={mediaUrlPrefix + store.primary_media}
-            alt="Profile"
-            width={764} // Required
-            height={225} // Required
-            //   width={764}
-            // height={226}
-            // style={{ borderRadius: "50%" }}
-            style={{
-              width: 764,
-              height: 225,
-            }}
-            className="rounded-3xl"
-          />
+          {store?.logo ? (
+            <Image
+              src={mediaUrlPrefix + store.logo}
+              alt="Profile"
+              width={764} // Required
+              height={225} // Required
+              //   width={764}
+              // height={226}
+              // style={{ borderRadius: "50%" }}
+              style={{
+                width: 764,
+                height: 225,
+              }}
+              className="rounded-3xl"
+            />
+          ) : (
+            <div className="w-[47.75rem] h-[225px] bg-gray-200 rounded-3xl"></div>
+          )}
           <Image
             src={mediaUrlPrefix + store.primary_media}
             alt="Profile"
@@ -132,8 +157,26 @@ function VendorStore() {
 
         <div className="">
           <h1 className="text-xl font-bold">{store.name}</h1>
-          <p className="text-sm text-gray-600">⭐ 4.9 (300)</p>
+          {/* <p className="text-sm text-gray-600">⭐ 4.9 (300)</p> */}
           <p className="text-gray-500">{store.description}</p>
+        </div>
+
+        <div className="flex-row flex">
+          {/*     <h4 className="font-openSansRegular text-base text-kikaeGrey mr-3.5">
+            <span className="text-black">{store.length} </span>
+            Wishes
+          </h4> */}
+          <h4 className="font-openSansRegular text-base text-kikaeGrey mr-3.5">
+            <span className="text-black">{storeLikes?.length} </span>
+            Likes
+          </h4>
+          <h4 className="font-openSansRegular text-base text-kikaeGrey mr-3.5">
+            <span className="text-black">{store?.views} </span>Views
+          </h4>
+          <h4 className="font-openSansRegular text-base text-kikaeGrey mr-3.5">
+            <span className="text-black">{storeFollowers?.length} </span>
+            Followers
+          </h4>
         </div>
       </div>
 

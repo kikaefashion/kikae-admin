@@ -15,6 +15,7 @@ export type UsersState = {
   pendingVendors: singleStoreType[];
   unapprovedVendors: singleStoreType[];
   vendorDetails: singleStoreType | null;
+  ongoingDelivery: OrderItem[] | [];
 };
 
 export type UsersAction = {
@@ -28,6 +29,7 @@ export type UsersAction = {
   setPendingVendors: (pendingVendors: singleStoreType[] | []) => void;
   setUnapprovedVendors: (unapprovedVendors: singleStoreType[] | []) => void;
   setVendorDetails: (vendorDetails: singleStoreType | null) => void;
+  setOngoingDelivery: (ongoingDelivery: OrderItem[] | []) => void;
 };
 
 const initialState: UsersState = {
@@ -41,6 +43,7 @@ const initialState: UsersState = {
   unapprovedVendors: [],
   pendingVendors: [],
   vendorDetails: null,
+  ongoingDelivery: [],
 };
 
 export const createUsersSlice: StateCreator<UsersState & UsersAction> = (
@@ -57,4 +60,5 @@ export const createUsersSlice: StateCreator<UsersState & UsersAction> = (
   setPendingVendors: (pendingVendors) => set({ pendingVendors }),
   setUnapprovedVendors: (unapprovedVendors) => set({ unapprovedVendors }),
   setVendorDetails: (vendorDetails) => set({ vendorDetails }),
+  setOngoingDelivery: (ongoingDelivery) => set({ ongoingDelivery }),
 });

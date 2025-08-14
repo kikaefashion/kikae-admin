@@ -52,22 +52,20 @@ const ProductPerformance = ({
         <strong>Revenue Generated: </strong> ₦1,000,000
       </p>
 
-      <table className="w-full border-collapse border border-gray-200 text-black">
+      <table className="w-full text-black border-none">
         <thead>
-          <tr>
-            <th className="border border-gray-300 p-2">Products</th>
-            <th className="border border-gray-300 p-2">No. sold</th>
-            <th className="border border-gray-300 p-2">Revenue generated</th>
+          <tr className="flex space-x-4 text-left">
+            <th className="p-2 bg-white border-md flex-1">Products</th>
+            <th className="p-2 bg-white border-md flex-1">No. sold</th>
+            <th className="p-2 bg-white border-md flex-1">Revenue generated</th>
           </tr>
         </thead>
         <tbody>
           {salesData.map((sales, index) => (
-            <tr key={index} className="text-center">
-              <td className="border border-gray-300 p-2">
-                {sales.product_name}
-              </td>
-              <td className="border border-gray-300 p-2">{0}</td>
-              <td className="border border-gray-300 p-2">{sales.units_sold}</td>
+            <tr key={index} className="text-center flex space-x-4">
+              <td className="p-2 flex-1">{sales.product_name}</td>
+              <td className="p-2 flex-1">{0}</td>
+              <td className="p-2 flex-1">{sales.units_sold}</td>
             </tr>
           ))}
         </tbody>

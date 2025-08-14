@@ -41,13 +41,13 @@ export type reportedUsers = {
 };
 
 export type AdminProfileType = {
-  access: "ADMIN" | "SUPER_ADMIN";
-  defaultPassword: null | string;
+  role: "";
+  //  defaultPassword: string;
   email: string;
-  firstname: string;
+
   id: string;
-  isBlocked: boolean;
-  lastname: string;
+  //  isBlocked: boolean;
+  name: string;
 };
 
 export type userAuditTrail = {

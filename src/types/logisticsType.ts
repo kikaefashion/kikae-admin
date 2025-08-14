@@ -7,6 +7,8 @@ export type LogisticsType = {
   alt_phone: string | null;
   created_at: string;
   updated_at: string;
+  extra_weight_fee: number;
+  extra_pickup_increment: number;
   destinations: LogisticsDestinationType[];
 };
 

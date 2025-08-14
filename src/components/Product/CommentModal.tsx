@@ -5,76 +5,7 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 
-/* const reviews = [
-  {
-    name: "Chima",
-    rating: 4,
-    comment:
-      "This shirt is one of the best on this platform. It’s sleek and very comfortable on the body.",
-    date: "16/02/24",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    name: "Sandra Asake",
-    rating: 5,
-    comment:
-      "Wow, I really don’t know what to say, this is absolutely mind-blowing and amazing. The cloth is very good.",
-    date: "16/02/24",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    name: "Sandra Asake",
-    rating: 5,
-    comment:
-      "Wow, I really don’t know what to say, this is absolutely mind-blowing and amazing. The cloth is very good.",
-    date: "16/02/24",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-  {
-    name: "Sandra Asake",
-    rating: 5,
-    comment:
-      "Wow, I really don’t know what to say, this is absolutely mind-blowing and amazing. The cloth is very good.",
-    date: "16/02/24",
-    image:
-      "https://portal.nbaunitybar.org/tailor-api/storage/app/profile-pic/wCmgY7UuF3m2aZCPrX4uPuL3yaqkLRM0GhD9FaEn.jpg",
-  },
-];
-
-const comments = [
-  {
-    question: "How durable are the shirts?",
-    replies: [
-      "Vendor reply: They’re very durable",
-      "User reply: They’re very durable",
-    ],
-  },
-  {
-    question: "What are they made of?",
-    replies: ["User reply: They’re made up of pure wool."],
-  },
-  {
-    question: "How durable are the shirts?",
-    replies: [
-      "Vendor reply: They’re very durable",
-      "User reply: They’re very durable",
-    ],
-  },
-  {
-    question: "What are they made of?",
-    replies: [
-      "User reply: They’re made up of pure wool.",
-      "User reply: They’re made up of pure wool.",
-      "User reply: They’re made up of pure wool.",
-      "User reply: They’re made up of pure wool.",
-    ],
-  },
-]; */
-
-const CommentModal = () => {
+const CommentModal = ({ close }: { close: () => void }) => {
   const [tab, setTab] = useState("reviews");
   const [reviews, setReviews] = useState<
     {
@@ -125,10 +56,7 @@ const CommentModal = () => {
     <div className=" text-black ">
       <div className="flex justify-between items-center border-b pb-3">
         <h2 className="text-xl font-semibold">Reviews & Comments</h2>
-        <button
-          //  onClick={() => router.back()}
-          className="text-gray-500 hover:text-gray-800"
-        >
+        <button onClick={close} className="text-gray-500 hover:text-gray-800">
           &times;
         </button>
       </div>

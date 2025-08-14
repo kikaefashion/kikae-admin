@@ -20,24 +20,24 @@ const FinancialMetrics = ({ orders = [] }: { orders: OrderItem[] }) => {
   return (
     <div>
       <p>Payment Details</p>
-      <table className="w-full border-collapse border border-gray-200 text-black">
+      <table className="w-full text-black border-none">
         <thead>
-          <tr>
-            <th className="border border-gray-300 p-2">Date</th>
-            <th className="border border-gray-300 p-2">Name</th>
-            <th className="border border-gray-300 p-2">Amount</th>
-            <th className="border border-gray-300 p-2">Status</th>
+          <tr className="flex space-x-4 text-left">
+            <th className="p-2 bg-white border-md flex-1">Date</th>
+            <th className="p-2 bg-white border-md flex-1">Name</th>
+            <th className="p-2 bg-white border-md flex-1">Amount</th>
+            <th className="p-2 bg-white border-md flex-1">Status</th>
           </tr>
         </thead>
         <tbody>
           {orders.map((order, index) => (
-            <tr key={index} className="text-center">
-              <td className="border border-gray-300 p-2">
+            <tr key={index} className="text-center flex space-x-4">
+              <td className="p-2 flex-1">
                 {new Date(order.created_at).toDateString()}
               </td>
-              <td className="border border-gray-300 p-2">{order.name}</td>
-              <td className="border border-gray-300 p-2">{order.price}</td>
-              <td className="border border-gray-300 p-2">{order.status}</td>
+              <td className="p-2 flex-1">{order.name}</td>
+              <td className="p-2 flex-1">{order.price}</td>
+              <td className="p-2 flex-1">{order.status}</td>
             </tr>
           ))}
         </tbody>

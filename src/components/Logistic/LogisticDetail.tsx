@@ -2,12 +2,16 @@
 
 import { getLogistic } from "@/networking/endpoints/logistics/getLogistic";
 import { LogisticsType } from "@/types/logisticsType";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import LogisticsNav from "./LogisticsNav";
+import { removeLogistic } from "@/networking/endpoints/logistics/deleteLogistic";
 
 export default function LogisticsProviderDetails() {
   const params = useParams<{ id: string }>();
   const [logistic, setLogistic] = useState<LogisticsType>();
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleGetLogistic = async () => {
@@ -23,9 +27,22 @@ export default function LogisticsProviderDetails() {
   const areasCovered = logistic?.destinations.map((item) => item.area);
   const statesCovered = logistic?.destinations.map((item) => item.state.name);
 
+  const handleDeleteLogistic = async () => {
+    if (!logistic?.id) return;
+    const result = await removeLogistic(logistic.id);
+    if (result) {
+      // Redirect or update state after deletion
+      router.replace("/dashboard/logistics");
+    }
+  };
+
   return (
-    <div className="p-6">
-      <div className=" p-6 bg-white rounded-lg shadow-lg text-black">
+    <div className="p-6 h-full">
+      <LogisticsNav
+        handleDeleteLogistic={handleDeleteLogistic}
+        name={logistic?.name || "Logistics Provider"}
+      />
+      <div className=" p-6 bg-white h-full  rounded-3xl text-black">
         <table className="w-full ">
           <thead className="text-kikaeBlue">
             <tr>

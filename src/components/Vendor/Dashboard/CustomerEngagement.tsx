@@ -8,7 +8,7 @@ import React from "react";
   },
   {
     reviews: "Product reviews",
-    rating: 4.5,
+    rating: 4.5,  
     total: 5,
   },
   {
@@ -39,7 +39,6 @@ import React from "react";
 ]; */
 
 const CustomerEngagement = ({ products }: { products: productData[] }) => {
-  console.log({ products: products[0].ratings });
   return (
     <div>
       <p className="text-gray-700">
@@ -52,19 +51,19 @@ const CustomerEngagement = ({ products }: { products: productData[] }) => {
         <strong>Average product rating: </strong> ₦4.7 stars
       </p>
 
-      <table className="w-full border-collapse border border-gray-200 text-black">
+      <table className="w-full text-black border-none">
         <thead>
-          <tr>
-            <th className="border border-gray-300 p-2">Product</th>
-            <th className="border border-gray-300 p-2">Ratings</th>
-            <th className="border border-gray-300 p-2">Toal</th>
+          <tr className="flex space-x-4 text-left">
+            <th className="p-2 bg-white border-md flex-1">Product</th>
+            <th className="p-2 bg-white border-md flex-1">Ratings</th>
+            <th className="p-2 bg-white border-md flex-1">Toal</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
-            <tr key={index} className="text-center">
-              {<td className="border border-gray-300 p-2">{product.name}</td>}
-              <td className="border border-gray-300 p-2">
+            <tr key={index} className="text-center flex space-x-4">
+              {<td className="p-2 flex-1">{product.name}</td>}
+              <td className="p-2 flex-1">
                 {" "}
                 {product?.ratings?.length > 0
                   ? (
@@ -73,9 +72,7 @@ const CustomerEngagement = ({ products }: { products: productData[] }) => {
                     ).toFixed(1)
                   : "0"}
               </td>
-              <td className="border border-gray-300 p-2">
-                {product.ratings?.length}
-              </td>
+              <td className="p-2 flex-1">{product?.ratings?.length}</td>
             </tr>
           ))}
         </tbody>

@@ -8,6 +8,7 @@ import { filterProductsByStatus } from "@/networking/endpoints/products/filterPr
 import { updateProductStatus } from "@/networking/endpoints/products/updateProductStatus";
 
 import type { productData } from "@/types/ProductType";
+import Loader from "@/utils/Loader";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -109,6 +110,7 @@ const Table = () => {
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    setLoading(true);
     filterProductsByStatus(
       status as "pending" | "approved" | "unapproved"
     ).then((res) => {
@@ -123,12 +125,17 @@ const Table = () => {
   }, [type, products]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-kikaeBlue"></div>
-      </div>
-    );
+    return <Loader />;
   }
+
+  const handleDeleteProduct = async (id: string) => {
+    await deleteProduct(id);
+    const res = await filterProductsByStatus(
+      status as "pending" | "approved" | "unapproved"
+    );
+    setProducts(res.products);
+    setFilteredProducts(filterProducts(res.products, type));
+  };
 
   return (
     <div className="overflow-x-auto p-4 text-black">
@@ -270,7 +277,7 @@ const Table = () => {
                   </td>
                 ) : (
                   <td
-                    onClick={() => deleteProduct(item.id)}
+                    onClick={() => handleDeleteProduct(item.id.toString())}
                     className="p-3 text-kikaeGrey underline  cursor-pointer"
                   >
                     Delete

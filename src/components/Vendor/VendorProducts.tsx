@@ -26,15 +26,15 @@ const VendorProducts = ({
       {storeProducts.map((product) => (
         <div
           key={product.id}
-          onClick={() => router.push("/dashboard/products/1")}
+          onClick={() => router.push(`/dashboard/products/${product.id}`)}
           className="rounded-3xl relative cursor-pointer "
         >
           <Image
-            src={mediaUrlPrefix + product.media[0].url}
+            src={mediaUrlPrefix + product?.media[0]?.url}
             alt={product.name}
             width={183}
             height={204}
-            className="rounded-3xl w-[183px] h-[204px] h-40 object-cover"
+            className="rounded-3xl  w-[183px] h-[204px] h-40 object-cover"
           />
           <h2 className="text-base font-openSansRegular mt-2 text-black">
             {product.name}

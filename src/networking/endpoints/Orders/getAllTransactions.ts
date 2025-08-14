@@ -13,5 +13,6 @@ export const getAllTransactions = async () => {
     },
   });
   const data = await response.json();
+  console.log("All Transactions Data:", data);
   return data;
 };

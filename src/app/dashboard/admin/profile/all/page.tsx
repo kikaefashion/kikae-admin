@@ -29,14 +29,12 @@ const Page = () => {
     useState(false);
 
   const [adminId, setAdminId] = useState("");
+  const handleGetAllAdmins = async () => {
+    const adminResult = await getAllAdmin();
 
+    setAdmins(adminResult.admins);
+  };
   useEffect(() => {
-    const handleGetAllAdmins = async () => {
-      const adminResult = await getAllAdmin();
-
-      setAdmins(adminResult.admins);
-    };
-
     handleGetAllAdmins();
   }, []);
 
@@ -148,6 +146,7 @@ const Page = () => {
         <DeleteAdminModal
           id={adminId}
           setIsVisible={setIsDeleteAdminModalVisible}
+          handleGetAllAdmins={handleGetAllAdmins}
         />
       </MyModal>
     </div>
