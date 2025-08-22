@@ -18,6 +18,10 @@ import { getDashboardStats } from "@/networking/endpoints/overview/dashboardStat
 import type { userAddress, UserProfileType } from "@/types/types";
 import { useRouter } from "next/navigation";
 import { getCategoriesSales } from "@/networking/endpoints/overview/getCategoriesSales";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
+import { FaPrint } from "react-icons/fa";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -35,6 +39,7 @@ export default function Overview() {
       items_sold: number;
     }[]
   >([]);
+
   const [products, setProducts] = useState<productData[]>([]);
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState<{
@@ -180,10 +185,56 @@ export default function Overview() {
     dashboardStats.monthly_wishlist,
     dashboardStats.total_users,
   ]);
+
   const router = useRouter();
 
+  const handlePrint = async () => {
+    const element = document.getElementById("dashboard-content");
+    if (!element) return;
+
+    try {
+      // Create canvas from the dashboard content
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      // Create PDF
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if content is longer than one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Download the PDF
+      const currentDate = new Date().toISOString().split("T")[0];
+      pdf.save(`dashboard-overview-${currentDate}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
+    }
+  };
+
   return (
-    <div className="p-6 space-y-6 text-black">
+    <div id="dashboard-content" className="p-6 space-y-6 text-black">
       <div className="flex items-center justify-between">
         <div>
           <h4 className="text-2xl font-bold">Hello, Dooyum! 👋</h4>
@@ -191,12 +242,23 @@ export default function Overview() {
             Here&apos;s your platform&apos;s performance at a glance.
           </h4>
         </div>
-        <button
-          onClick={() => router.push("/dashboard/pending-actions")}
-          className="border rounded-3xl py-[0.625rem] px-[0.875rem] text-[#AAA5A4;] bg-white"
-        >
-          View Pending Actions
-        </button>
+
+        <div>
+          <div
+            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2"
+            onClick={handlePrint}
+          >
+            <span className="text-kikaeBlue font-bold mr-2">Print</span>
+            <FaPrint />
+          </div>
+
+          <button
+            onClick={() => router.push("/dashboard/pending-actions")}
+            className="border rounded-3xl py-[0.625rem] px-[0.875rem] text-[#AAA5A4;] bg-white"
+          >
+            View Pending Actions
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
