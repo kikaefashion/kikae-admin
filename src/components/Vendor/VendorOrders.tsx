@@ -49,7 +49,8 @@ const VendorOrders = ({ storeOrders }: { storeOrders: OrderItem[] }) => {
             <div className="text-sm mt-2">
               {item.color && (
                 <p>
-                  <span className="font-semibold">Colour:</span> {item.color}
+                  <span className="font-semibold">Colour:</span>{" "}
+                  {item.color.name}
                 </p>
               )}
               {item.size && (
