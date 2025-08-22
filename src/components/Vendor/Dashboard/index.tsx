@@ -65,6 +65,7 @@ const Dashboard = ({
         units_sold: 0,
         total_revenue: 0,
         ratings: product.ratings,
+        views: product.views || 0, // Ensure views is initialized
       });
     });
 
@@ -209,10 +210,22 @@ const Dashboard = ({
                 setDateRange({ ...dateRange, to: e.target.value });
                 setEndDate(new Date(e.target.value));
               }}
-              className="rounded-3xl  p-2"
+              className="rounded-3xl p-2"
             />
-            <button className="text-base font-bold text-kikaeBlue">
-              Apply
+
+            {/* Reset button */}
+            <button
+              className="text-base font-bold text-red-500"
+              onClick={() => {
+                setDateRange({
+                  from: "2025-01-01",
+                  to: "2025-12-31",
+                });
+                setStartDate(new Date(store?.created_at || "2025-01-01"));
+                setEndDate(new Date());
+              }}
+            >
+              Reset
             </button>
           </div>
           {metricParam == "sales_metrics" && (
@@ -221,11 +234,12 @@ const Dashboard = ({
           {metricParam == "financial_metrics" && (
             <FinancialMetrics orders={orders} />
           )}
-          {metricParam == "logistics_metrics" && <LogisticsMetrics />}
+          {metricParam == "logistics_metrics" && (
+            <LogisticsMetrics start_date={startDate} end_date={endDate} />
+          )}
           {metricParam == "product_performance" && (
             <ProductPerformance salesData={salesData} />
           )}
-
           {metricParam == "customer_engagement" && (
             <CustomerEngagement products={storeProducts} />
           )}

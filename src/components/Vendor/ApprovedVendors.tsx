@@ -37,6 +37,8 @@ const ApprovedVendors = () => {
       setApprovedVendors(approvedStoresResult);
     }
   };
+
+  console.log({ approvedVendors });
   return (
     <div className="p-6 min-h-screen text-black">
       <div className="bg-white shadow rounded-xl overflow-hidden">

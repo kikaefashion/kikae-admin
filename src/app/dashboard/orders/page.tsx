@@ -27,6 +27,7 @@ const orderStatuses = [
   "Out for delivery",
   "Confirmed",
   "Order placed",
+  "Ready for delivery",
 ];
 const dropdownList = ["vendor payouts", "transaction fees breakdown"];
 
@@ -490,6 +491,7 @@ function FashionStore({}) {
           isLoading={initialLoading}
           financialStats={financialStats}
           orders={orders}
+          setOrders={setOrders}
         />
       )}
       {page == "vendor_payouts" && <PayoutTable />}

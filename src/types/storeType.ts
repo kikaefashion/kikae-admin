@@ -78,3 +78,17 @@ export type singleStoreType = {
   isFreebie: boolean;
   freebieExpires?: number;
 };
+
+export type vendorLogisticsMetrics = {
+  fulfillment_rate: number;
+  total_return_requests: number;
+  average_delivery_time: string;
+  return_requests: {
+    data: {
+      order_id: string;
+      product_name: string;
+      status: string;
+      reason: string;
+    }[];
+  };
+};

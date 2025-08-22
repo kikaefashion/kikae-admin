@@ -6,6 +6,7 @@ import Link from "next/link";
 import { dm_sans } from "@/app/ui/fonts";
 
 import Logout from "@/assets/Logout";
+import { logout } from "@/utils/logout";
 
 const sidebarContents = [
   {
@@ -87,7 +88,7 @@ const Sidebar = () => {
       <div className="flex justify-center py-2.5">
         <Logout />{" "}
         <Link
-          //onClick={logout}
+          onClick={logout}
           href={"/"}
           className="text-slate-400 text-right ml-6"
         >

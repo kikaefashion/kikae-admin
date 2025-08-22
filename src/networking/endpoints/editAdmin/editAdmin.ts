@@ -23,7 +23,7 @@ export const editAdmin = async (
         //admin_id,
         name,
         // email,
-        password,
+        password: password ? password : null,
 
         admin_role,
       }),

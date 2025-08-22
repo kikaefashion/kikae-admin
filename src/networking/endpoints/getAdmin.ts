@@ -1,7 +1,7 @@
 import Cookies from "universal-cookie";
 import { baseUrl } from "../apiUrl";
 
-export const getAdmin = async () => {
+export const getAdmin = async (admin_id: string) => {
   const cookies = new Cookies();
   const authToken = cookies.get("authToken");
   try {
@@ -12,6 +12,9 @@ export const getAdmin = async () => {
         "content-type": "application/json",
         authorization: `Bearer ${authToken}`,
       },
+      body: JSON.stringify({
+        admin_id,
+      }),
     });
 
     const result = await response.json();

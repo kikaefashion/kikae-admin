@@ -30,7 +30,15 @@ export type OrderItem = {
   biceps: string;
   bottom_length: string;
   chests: string;
-  color: string | null;
+  color: {
+    //  created_at: "2025-08-07T13:43:54.000000Z";
+    id: number;
+    name: string;
+    // product_id: "72";
+    //  updated_at: "2025-08-07T13:43:54.000000Z";
+    //  url: null;
+    //   value: "#000000";
+  };
   colour: string | null;
   created_at: string;
   delivery_address: string | null;
@@ -53,8 +61,12 @@ export type OrderItem = {
   settled: number;
   shoulder: string;
   size: string;
+  sizes: {
+    size: string;
+    id: number;
+  };
   sleeve: string;
-  status: string;
+  status: orderStatus;
   thigh: string;
   transaction: Transaction;
   transaction_id: number;
@@ -62,3 +74,10 @@ export type OrderItem = {
   updated_at: string;
   waist_length: string;
 };
+
+export type orderStatus =
+  | "order placed"
+  | "ready for delivery"
+  | "confirmed"
+  | "dispatched"
+  | "delivered";

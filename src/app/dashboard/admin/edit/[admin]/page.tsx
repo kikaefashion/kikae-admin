@@ -3,9 +3,10 @@ import { ArrowBack } from "@/assets/ArrowBack";
 import Loader from "@/components/Loader";
 //import { assignAdminRole } from "@/networking/endpoints/assignAdminRole";
 import { editAdmin } from "@/networking/endpoints/editAdmin/editAdmin";
-import { AdminProfileType } from "@/types/types";
+import { getAdmin } from "@/networking/endpoints/getAdmin";
+//import { AdminProfileType } from "@/types/types";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CreateAdminUser() {
   /*  const [firstName, setFirstName] = useState("");
@@ -13,21 +14,29 @@ export default function CreateAdminUser() {
   const [email, setEmail] = useState(""); */
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
+  // const [selectedRole, setSelectedRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const params = useParams<{ admin: string }>();
 
-  const [admin, setAdmin] = useState<AdminProfileType>({
+  const [admin, setAdmin] = useState<{
+    name: string;
+    email: string;
+    //defaultPassword: "",
+    admin_role: string;
+    id: string;
+    // isBlocked: false,
+  }>({
     name: "",
     email: "",
     //defaultPassword: "",
-    role: "",
+    admin_role: "",
     id: "",
     // isBlocked: false,
   });
 
   const roles = [
+    { name: "Super admin", role: "superadmin" },
     { name: "Sub admin", role: "subadmin" },
     { name: "Vendor admin", role: "vendoradmin" },
     { name: "Finance admin", role: "financeadmin" },
@@ -35,6 +44,20 @@ export default function CreateAdminUser() {
     { name: "Marketing admin", role: "marketingadmin" },
     { name: "Support admin", role: "supportadmin" },
   ];
+
+  const handleGetAdmin = async (id: string) => {
+    try {
+      const result = await getAdmin(id);
+
+      if (!result) return;
+
+      setAdmin(result.admins[0]);
+    } catch {}
+  };
+
+  useEffect(() => {
+    handleGetAdmin(params.admin);
+  }, [params.admin]);
 
   //const handleGetAdmin = async () => {};
 
@@ -51,13 +74,24 @@ export default function CreateAdminUser() {
   const handleEditAdmin = async () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
+      return;
+    }
+
+    if (!admin?.name) {
+      alert("name is Compulsory");
+      return;
+    }
+
+    if (!admin.admin_role) {
+      alert("role is compulsory");
+      return;
     }
     setIsLoading(true);
-    await editAdmin(params.admin, admin?.name, password, selectedRole);
+    await editAdmin(params.admin, admin?.name, password, admin?.admin_role);
     setIsLoading(false);
     router.back();
   };
-
+  //console.log({ admin });
   return (
     <div className="p-6 space-y-6 text-black">
       <div className="flex justify-between items-center">
@@ -123,15 +157,19 @@ export default function CreateAdminUser() {
             {roles.map((role) => (
               <label key={role.name} className="flex items-center space-x-2">
                 <input
+                  // defaultValue={admin.admin_role}
                   type="radio"
                   name="role"
-                  value={role.name}
-                  checked={selectedRole === role.role}
-                  onChange={() => setSelectedRole(role.role)}
+                  value={admin.admin_role}
+                  checked={admin.admin_role === role.role}
+                  onChange={() => {
+                    //setAdmin({...admin, admin_role:role.role})
+                    setAdmin({ ...admin, admin_role: role.role });
+                  }}
                 />
                 <span
                   className={
-                    selectedRole === role.role
+                    admin.admin_role === role.role
                       ? "text-blue-600 font-medium"
                       : "text-gray-700"
                   }

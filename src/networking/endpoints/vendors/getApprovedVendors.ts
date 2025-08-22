@@ -6,8 +6,8 @@ export const getApprovedStores = async () => {
 
   const authToken = cookies.get("authToken");
   try {
-    const response = await fetch(`${baseUrl}/admin/stores/approved`, {
-      method: "POST",
+    const response = await fetch(`${baseUrl}/stores/all`, {
+      method: "GET",
       headers: {
         accept: "application/json",
         "content-type": "application/json",

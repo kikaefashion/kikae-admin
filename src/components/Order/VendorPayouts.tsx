@@ -1,27 +1,56 @@
 "use client";
 
-import { getVendorPayouts } from "@/networking/endpoints/Orders/getVendorPayouts";
+import { withdraw } from "@/networking/endpoints/Orders/approveWithdraw";
+import { deletePayoutRequest } from "@/networking/endpoints/Orders/deletePayoutRequest";
+import { getPayoutRequests } from "@/networking/endpoints/Orders/getPayoutsRequests";
+import { payoutRequestType } from "@/types/pendingPayouts";
+//import { getVendorPayouts } from "@/networking/endpoints/Orders/getVendorPayouts";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PayoutTable() {
   const router = useRouter();
-  const [payoutData, setPayoutData] = useState([]);
+  const [payoutData, setPayoutData] = useState<payoutRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleDeletePayoutRequest = async (id: number) => {
+    try {
+      const result = await deletePayoutRequest(id);
+
+      if (!result) return;
+
+      fetchPayoutData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchPayoutData = async () => {
+    try {
+      const data = await getPayoutRequests();
+      //console.log("Payout Data:", data);
+      setPayoutData(data.data);
+      console.log({ data });
+    } catch (error) {
+      console.error("Error fetching payout data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleApprove = async (item: payoutRequestType) => {
+    const result = await withdraw(
+      item?.withdraw_request?.account_name,
+      item?.withdraw_request?.account_number,
+      item?.withdraw_request?.bank_code,
+      item?.withdrawable_balance,
+      item?.withdraw_request?.user_id
+    );
+
+    if (!result) return;
+
+    fetchPayoutData();
+  };
   useEffect(() => {
-    const fetchPayoutData = async () => {
-      try {
-        const data = await getVendorPayouts();
-        console.log("Payout Data:", data);
-        // setPayoutData(data.data);
-        console.log({ data });
-      } catch (error) {
-        console.error("Error fetching payout data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchPayoutData();
   }, []);
   console.log({ setPayoutData });
@@ -116,47 +145,47 @@ export default function PayoutTable() {
           </tr>
         </thead>
         <tbody>
-          {payoutData.map(
-            (
-              item: {
-                vendorName: string;
-                pendingPayout: string;
-                availablePayout: string;
-                total: number;
-                payoutMethod: string;
-                bank: string;
-                accountNumber: string;
-                accountName: string;
-              },
-              index: number
-            ) => (
-              <tr key={index} className="text-center">
-                <td
+          {payoutData.map((item, index: number) => (
+            <tr key={index} className="text-center">
+              <td
+                onClick={() => {
+                  router.push("/dashboard/users/vendors/1?page=products");
+                }}
+                className="p-3 underline cursor-pointer"
+              >
+                {item?.withdraw_request?.user?.fname}
+              </td>
+              <td className="p-3">
+                ₦{item?.pending_balance?.toLocaleString()}
+              </td>
+              <td className="p-3">
+                ₦{item?.withdrawable_balance?.toLocaleString()}
+              </td>
+              <td className="p-3">₦{item?.total_sales?.toLocaleString()}</td>
+              <td className="p-3">{item?.withdraw_request?.payout_method}</td>
+              <td className="p-3">{item?.withdraw_request?.bank}</td>
+              <td className="p-3">{item?.withdraw_request?.account_number}</td>
+              <td className="p-3">{item?.withdraw_request?.account_name}</td>
+              <td className="p-3 flex items-center gap-2">
+                <button
                   onClick={() => {
-                    router.push("/dashboard/users/vendors/1?page=products");
+                    handleApprove(item);
                   }}
-                  className="p-3 underline cursor-pointer"
+                  className="text-green-600 font-semibold mr-2"
                 >
-                  {item.vendorName}
-                </td>
-                <td className="p-3">₦{item.pendingPayout.toLocaleString()}</td>
-                <td className="p-3">
-                  ₦{item.availablePayout.toLocaleString()}
-                </td>
-                <td className="p-3">₦{item.total.toLocaleString()}</td>
-                <td className="p-3">{item.payoutMethod}</td>
-                <td className="p-3">{item.bank}</td>
-                <td className="p-3">{item.accountNumber}</td>
-                <td className="p-3">{item.accountName}</td>
-                <td className="p-3 flex items-center gap-2">
-                  <button className="text-green-600 font-semibold mr-2">
-                    Approve
-                  </button>
-                  <button className="text-red-600 font-semibold">Reject</button>
-                </td>
-              </tr>
-            )
-          )}
+                  Approve
+                </button>
+                <button
+                  onClick={() =>
+                    handleDeletePayoutRequest(item?.withdraw_request?.id)
+                  }
+                  className="text-red-600 font-semibold"
+                >
+                  Reject
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

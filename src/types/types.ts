@@ -41,7 +41,7 @@ export type reportedUsers = {
 };
 
 export type AdminProfileType = {
-  role: "";
+  admin_role: "";
   //  defaultPassword: string;
   email: string;
 

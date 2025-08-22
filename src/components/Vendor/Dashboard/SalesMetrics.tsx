@@ -29,21 +29,32 @@ const SalesMetrics = ({
     units_sold: number;
   }[];
 }) => {
+  const totalSalesVolume = salesData.reduce(
+    (total, item) => total + (Number(item.units_sold) || 0),
+    0
+  );
+
+  const totalRevenueGenerated = salesData.reduce(
+    (total, item) => total + (Number(item.total_revenue) || 0),
+    0
+  );
   return (
     <div>
       <p className="text-gray-700">
-        <strong>Most viewed product:</strong> T-shirt and sleeves (3,000 Views)
+        <strong>Total Sales Volume:</strong> {totalSalesVolume} Items
       </p>
+
       <p className="text-gray-700 mb-4">
-        <strong>Revenue Generated:</strong> T-shirt and sleeves (400 Sales)
+        <strong>Revenue Generated: </strong> ₦
+        {totalRevenueGenerated?.toLocaleString()}
       </p>
 
       <table className="w-full text-black border-none  ">
         <thead>
           <tr className="flex space-x-4 text-left">
             <th className="p-2 bg-white border-md flex-1">Products</th>
-            <th className="p-2 bg-white border-md flex-1">Views</th>
-            <th className="p-2 bg-white border-md flex-1">Sales</th>
+            <th className="p-2 bg-white border-md flex-1">No. sold</th>
+            <th className="p-2 bg-white border-md flex-1">Revenue Generated</th>
           </tr>
         </thead>
         <tbody>
@@ -52,7 +63,9 @@ const SalesMetrics = ({
               <tr key={index} className="text-center flex space-x-4">
                 <td className="p-2 flex-1">{product.product_name}</td>
                 <td className="p-2 flex-1">{product.units_sold}</td>
-                <td className="p-2 flex-1">{product.total_revenue}</td>
+                <td className="p-2 flex-1">
+                  {product.total_revenue?.toLocaleString()}
+                </td>
               </tr>
             ))}
         </tbody>

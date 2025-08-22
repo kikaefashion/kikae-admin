@@ -2,6 +2,7 @@
 
 import { deleteRunwayVideo } from "@/networking/endpoints/runway/deleteRunwayVideo";
 import { getRunwayVideos } from "@/networking/endpoints/runway/getRunwayVideos";
+import { searchRunway } from "@/networking/endpoints/runway/searchRunway";
 import { useBoundStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,16 +14,23 @@ export default function AllVideos() {
 
   const allRunwayVideos = useBoundStore((state) => state.allRunwayVideos);
   const setAllRunwayVideos = useBoundStore((state) => state.setAllRunwaVideos);
+  const handleSearchRunway = async (keyword: string) => {
+    const result = await searchRunway(keyword);
+
+    console.log("search", result);
+
+    setAllRunwayVideos(result.data);
+  };
+  const handleGetAllRunwayVideos = async () => {
+    const result = await getRunwayVideos();
+
+    setAllRunwayVideos(result.data);
+  };
 
   const router = useRouter();
   useEffect(() => {
-    const handleGetAllRunwayVideos = async () => {
-      const result = await getRunwayVideos();
-
-      setAllRunwayVideos(result.data);
-    };
     handleGetAllRunwayVideos();
-  }, [setAllRunwayVideos]);
+  }, []);
 
   const handleDeletRunwayVideo = async (id: number) => {
     const result = await deleteRunwayVideo(id);
@@ -36,10 +44,13 @@ export default function AllVideos() {
     <div className="p-6 w-full text-black">
       <div className="mb-4">
         <input
-          type="text"
+          type="search"
           placeholder="Search for runway video"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            handleSearchRunway(e.target.value);
+          }}
           className="w-full max-w-lg p-2 border rounded"
         />
       </div>

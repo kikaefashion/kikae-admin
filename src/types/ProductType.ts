@@ -2,6 +2,7 @@ import { AllCategoriesTypes } from "./categoriesType";
 import { singleStoreType } from "./storeType";
 
 export type productData = {
+  views: number;
   ankle_width: string;
   arm_width: string;
   belly_length: string;

@@ -117,7 +117,7 @@ export default function FeeTable() {
               >
                 {item.type}
               </td>
-              <td className="p-3">₦{item.amount.toLocaleString()}</td>
+              <td className="p-3">₦{item.amount?.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>

@@ -3,7 +3,7 @@
 import { getMyBanks } from "@/networking/endpoints/vendors/getStoreBanks";
 import { bankType } from "@/types/bankType";
 import { useEffect, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+/* import { FaEdit, FaTrash } from "react-icons/fa"; */
 
 const BankCard = ({
   name,
@@ -30,14 +30,14 @@ const BankCard = ({
               : "bg-blue-600 text-white hover:bg-blue-700 transition"
           }`}
         >
-          {isDefault ? "Default" : "Set as default"}
+          {"Default"}
         </button>
-        <button className="p-2 text-gray-600 hover:text-blue-600">
+        {/*  <button className="p-2 text-gray-600 hover:text-blue-600">
           <FaEdit />
         </button>
         <button className="p-2 text-gray-600 hover:text-red-600">
           <FaTrash />
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -99,7 +99,7 @@ const UserProfile = ({
             User details
           </h4>
 
-          <button
+         {/*  <button
             onClick={() => {
               // router.push(`/dashboard/users/audit_trail/${params.id}`);
             }}
@@ -110,7 +110,7 @@ const UserProfile = ({
                 View audit trail
               </div>
             </div>
-          </button>
+          </button> */}
         </div>
 
         <div className=" flex-col justify-center items-end gap-6 inline-flex">

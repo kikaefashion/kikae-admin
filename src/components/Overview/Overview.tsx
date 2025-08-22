@@ -16,6 +16,8 @@ import { getCategories } from "@/networking/endpoints/categories/getCategories";
 import { getAllUsers } from "@/networking/endpoints/users/getAllUsers";
 import { getDashboardStats } from "@/networking/endpoints/overview/dashboardStats";
 import type { userAddress, UserProfileType } from "@/types/types";
+import { useRouter } from "next/navigation";
+import { getCategoriesSales } from "@/networking/endpoints/overview/getCategoriesSales";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -25,6 +27,14 @@ interface StatCardProps {
 }
 
 export default function Overview() {
+  const [categoriesSales, setCategoriesSales] = useState<
+    {
+      id: number;
+      name: "All";
+      total_sales: number;
+      items_sold: number;
+    }[]
+  >([]);
   const [products, setProducts] = useState<productData[]>([]);
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState<{
@@ -87,6 +97,8 @@ export default function Overview() {
       setUsers(users.users);
       const result = await getDashboardStats();
       setDashboardStats(result);
+      const categoriesSalesResult = await getCategoriesSales();
+      setCategoriesSales(categoriesSalesResult.data);
     };
     fetchProducts();
   }, []);
@@ -168,14 +180,24 @@ export default function Overview() {
     dashboardStats.monthly_wishlist,
     dashboardStats.total_users,
   ]);
+  const router = useRouter();
 
   return (
     <div className="p-6 space-y-6 text-black">
-      <div className="text-2xl font-bold">Hello, Dooyum! 👋</div>
-      <div className="text-gray-600">
-        Here&apos;s your platform&apos;s performance at a glance.
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-2xl font-bold">Hello, Dooyum! 👋</h4>
+          <h4 className="text-gray-600">
+            Here&apos;s your platform&apos;s performance at a glance.
+          </h4>
+        </div>
+        <button
+          onClick={() => router.push("/dashboard/pending-actions")}
+          className="border rounded-3xl py-[0.625rem] px-[0.875rem] text-[#AAA5A4;] bg-white"
+        >
+          View Pending Actions
+        </button>
       </div>
-
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
           title="Total products"
@@ -250,22 +272,29 @@ export default function Overview() {
         <table className="w-full text-left">
           <thead>
             <tr className="text-sm text-gray-500 border-b">
-              <th className="py-2">Rank</th>
+              <th className="py-2">S/N</th>
               <th className="py-2">Category name</th>
               <th className="py-2">Sales (₦)</th>
               <th className="py-2">Items sold</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b">
-              <td className="py-2">1</td>
-              <td className="py-2 text-blue-600 underline cursor-pointer">
-                Men&apos;s Clothing
-              </td>
-              <td className="py-2">₦1,200,000</td>
-              <td className="py-2">320</td>
-            </tr>
-            <tr className="border-b">
+            {categoriesSales?.length > 0 &&
+              categoriesSales.map((item, index) => {
+                return (
+                  <tr key={item.id} className="border-b">
+                    <td className="py-2">{index + 1}</td>
+                    <td className="py-2 text-blue-600 underline cursor-pointer">
+                      {item.name}
+                    </td>
+                    <td className="py-2">
+                      ₦ {item?.total_sales.toLocaleString()}
+                    </td>
+                    <td className="py-2">{item.items_sold}</td>
+                  </tr>
+                );
+              })}
+            {/*  <tr className="border-b">
               <td className="py-2">2</td>
               <td className="py-2 text-blue-600 underline cursor-pointer">
                 Women&apos;s Clothing
@@ -280,7 +309,7 @@ export default function Overview() {
               </td>
               <td className="py-2">₦600,000</td>
               <td className="py-2">150</td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>

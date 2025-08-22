@@ -5,6 +5,7 @@ import RejectProduct from "@/components/Product/Modal/RejectProductModal";
 import { mediaUrlPrefix } from "@/networking/apiUrl";
 import { deleteProduct } from "@/networking/endpoints/products/deleteProduct";
 import { filterProductsByStatus } from "@/networking/endpoints/products/filterProductsByStatus";
+import { searchProducts } from "@/networking/endpoints/products/searchProducts";
 import { updateProductStatus } from "@/networking/endpoints/products/updateProductStatus";
 
 import type { productData } from "@/types/ProductType";
@@ -86,6 +87,7 @@ const Table = () => {
   const status = useSearchParams().get("status");
   const [products, setProducts] = useState<productData[]>([]);
   const [productId, setProductId] = useState("");
+  const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState<productData[]>([]);
 
@@ -137,6 +139,16 @@ const Table = () => {
     setFilteredProducts(filterProducts(res.products, type));
   };
 
+  const handleSearchProducts = async () => {
+    try {
+      const result = await searchProducts(search);
+
+      setProducts(result.data);
+
+      console.log({ result });
+    } catch {}
+  };
+
   return (
     <div className="overflow-x-auto p-4 text-black">
       <MyModal isVisible={isVisible} close={() => setIsVisible(false)}>
@@ -146,13 +158,14 @@ const Table = () => {
         <div className="w-[26.68rem]   flex justify-between items-center bg-white rounded-3xl border border-black/25 ">
           <input
             placeholder="search for a product"
-            // value={search}
-            // onChange={(e) => setSearch(e.target.value)}
-
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             type="text"
             className="w-11/12 py-1.5 rounded-3xl px-6 text-black text-base font-normal font-['DM Sans'] leading-[30px] border-none"
           />
-          <button className="px-6">search</button>
+          <button onClick={handleSearchProducts} className="px-6">
+            search
+          </button>
         </div>
 
         {
