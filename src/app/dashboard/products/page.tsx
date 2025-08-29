@@ -149,6 +149,16 @@ const Table = () => {
     } catch {}
   };
 
+  const handleUpdateOrderStatus = async (item: productData) => {
+    const result = await updateProductStatus(item.id, "approved");
+
+    if (!result) return;
+
+    setFilteredProducts(
+      filteredProducts.filter((product) => item.id != product.id)
+    );
+  };
+
   return (
     <div className="overflow-x-auto p-4 text-black">
       <MyModal isVisible={isVisible} close={() => setIsVisible(false)}>
@@ -273,7 +283,9 @@ const Table = () => {
                 {status == "pending" ? (
                   <td className="px-6 py-4 flex flex-row gap-2.5">
                     <button
-                      onClick={() => updateProductStatus(item.id, "approved")}
+                      onClick={() => {
+                        handleUpdateOrderStatus(item);
+                      }}
                       className="text-kikaeBlue underline"
                     >
                       Accept
