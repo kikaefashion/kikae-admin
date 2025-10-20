@@ -8,7 +8,7 @@ import { removeLogisticDestination } from "@/networking/endpoints/logistics/remo
 import { updateLogistic } from "@/networking/endpoints/logistics/updateLogistic";
 import { updateLogisticDestination } from "@/networking/endpoints/logistics/updateLogisticDestination";
 import type { LogisticsType } from "@/types/logisticsType";
-import { stateType } from "@/types/stateType";
+import type { stateType } from "@/types/stateType";
 import { Check } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -40,21 +40,24 @@ function EditLogistics({
 }) {
   const logistic_id = useSearchParams().get("logistic");
   const [logistic, setLogistic] = useState<LogisticsType | null>(null);
-  /*   const [name, setName] = useState(logistic?.name);
-  const [number, setNumber] = useState(logistic?.phone);
-  const [email, setEmail] = useState(logistic?.email); */
   const [states, setStates] = useState<stateType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLogisticLoading, setIsLogisticLoading] = useState(true);
 
-  // const [destinations, setDestinations] = useState<Destination[]>([
-  //   { name: "Ikeja", fee: "2500" },
-  //   { name: "Ikorodu", fee: "3000" },
-  //   { name: "Epe", fee: "3500" },
-  // ])
+  const [selectedStateForNewDestination, setSelectedStateForNewDestination] =
+    useState<string>("");
 
   const addDestination = () => {
-    if (!logistic) return;
+    if (!logistic || !selectedStateForNewDestination) {
+      alert("Please select a state first");
+      return;
+    }
+
+    const selectedState = states.find(
+      (s) => s.id === Number(selectedStateForNewDestination)
+    );
+    if (!selectedState) return;
+
     const updatedLogistic = {
       ...logistic,
       destinations: [
@@ -62,16 +65,17 @@ function EditLogistics({
         {
           id: 0,
           logistic_id: "",
-          state_id: "",
+          state_id: String(selectedState.id),
           area: "",
           cost: "",
-          state: { name: "", id: 0 },
+          state: { name: selectedState.name, id: selectedState.id },
         },
       ],
     };
     if (!updatedLogistic) return;
 
     setLogistic(updatedLogistic);
+    setSelectedStateForNewDestination("");
   };
 
   const removeDestination = async (index: number, id: string | number) => {
@@ -100,7 +104,6 @@ function EditLogistics({
   };
 
   const handleUpdateLogistic = async () => {
-    // console.log({ logistic, name, email, number });
     if (
       !logistic?.id ||
       !logistic?.name ||
@@ -134,6 +137,7 @@ function EditLogistics({
 
     handleGetLogistic();
   }, [logistic_id]);
+
   const handleUpdateLogistination = async (
     id: string | number,
     destination_id: string | number,
@@ -149,6 +153,28 @@ function EditLogistics({
     updateLogisticDestination(id, destination_id, area, cost, state_id);
   };
 
+  type DestinationWithIndex = LogisticsType["destinations"][number] & {
+    originalIndex: number;
+  };
+
+  const groupedDestinations = logistic?.destinations.reduce(
+    (acc, destination, index) => {
+      const stateId = destination.state.id || 0;
+      if (!acc[stateId]) {
+        acc[stateId] = {
+          stateName: destination.state.name || "Unknown State",
+          destinations: [],
+        };
+      }
+      acc[stateId].destinations.push({ ...destination, originalIndex: index });
+      return acc;
+    },
+    {} as Record<
+      number,
+      { stateName: string; destinations: DestinationWithIndex[] }
+    >
+  );
+
   if (isLogisticLoading) return <Loader />;
   if (!logistic) {
     return (
@@ -159,10 +185,7 @@ function EditLogistics({
   }
 
   return (
-    <div
-      className="text-black"
-      //className="mx-auto p-6 rounded-lg shadow-lg"
-    >
+    <div className="text-black">
       <h2 className="text-xl font-semibold mb-4 text-center">
         Edit Logistics Provider
       </h2>
@@ -175,39 +198,92 @@ function EditLogistics({
         onChange={(e) => setLogistic({ ...logistic, name: e.target.value })}
       />
 
-      {/*       <select className="w-full border p-3.5 rounded-3xl mb-3">
-        <option>Delivering from (State)</option>
-        <option>Lagos</option>
-        <option>Abuja</option>
-        <option>Rivers</option>
-      </select>
-      <select className="w-full border p-3.5 rounded-3xl mb-3">
-        <option>Delivering to (State)</option>
-        <option>Kano</option>
-        <option>Imo</option>
-        <option>Ogun</option>
-      </select> */}
       <h3 className="text-lg font-medium mb-2 text-center">
         Destinations & Delivery Fees
       </h3>
-      {logistic?.destinations?.map((destination, index) => (
-        <div key={index} className="flex space-x-2 mb-2 items-center">
+
+      <div className="mb-4 space-y-4">
+        {groupedDestinations &&
+          Object.entries(groupedDestinations).map(([stateId, group]) => (
+            <div key={stateId} className="border rounded-lg p-3 bg-gray-50">
+              <h4 className="font-semibold text-md mb-2 text-kikaeBlue">
+                {group.stateName}
+              </h4>
+              <div className="space-y-2">
+                {group.destinations.map((destination) => (
+                  <div
+                    key={destination.originalIndex}
+                    className="flex space-x-2 items-center pl-4"
+                  >
+                    <input
+                      type="text"
+                      value={destination.area}
+                      onChange={(e) =>
+                        handleDestinationChange(
+                          destination.originalIndex,
+                          "area",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Area/Destination"
+                      className="flex-1 border p-3.5 rounded-3xl"
+                    />
+                    <input
+                      type="text"
+                      value={destination.cost}
+                      onChange={(e) =>
+                        handleDestinationChange(
+                          destination.originalIndex,
+                          "cost",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Fee (₦)"
+                      className="w-[25%] border p-3.5 rounded-3xl"
+                    />
+
+                    <button
+                      className="text-kikaeBlue"
+                      onClick={() =>
+                        handleUpdateLogistination(
+                          logistic.id,
+                          destination.id,
+                          destination.area,
+                          destination.cost,
+                          destination?.state?.id
+                        )
+                      }
+                      title="Save changes"
+                    >
+                      <Check />
+                    </button>
+
+                    <button
+                      className="text-red-500"
+                      onClick={() =>
+                        removeDestination(
+                          destination.originalIndex,
+                          destination.id
+                        )
+                      }
+                      title="Delete destination"
+                    >
+                      <IoTrashBin />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+      </div>
+
+      <div className="mb-3 p-3 border rounded-lg bg-blue-50">
+        <p className="text-sm font-medium mb-2">Add New Destination</p>
+        <div className="flex space-x-2 items-center">
           <select
-            value={destination.state.id || ""}
-            onChange={(e) => {
-              const selectedId = Number(e.target.value);
-              const selectedState = states.find((s) => s.id === selectedId);
-              if (!selectedState) return;
-
-              const updatedDestinations = [...logistic.destinations];
-              updatedDestinations[index].state = {
-                id: selectedState.id,
-                name: selectedState.name,
-              };
-
-              setLogistic({ ...logistic, destinations: updatedDestinations });
-            }}
-            className="flex-1 border p-3.5 rounded-3xl w-[40%] cursor-pointer"
+            value={selectedStateForNewDestination}
+            onChange={(e) => setSelectedStateForNewDestination(e.target.value)}
+            className="flex-1 border p-3.5 rounded-3xl cursor-pointer"
           >
             <option value="">Select state</option>
             {states.map((item) => (
@@ -216,60 +292,14 @@ function EditLogistics({
               </option>
             ))}
           </select>
-
-          {/*  <input
-            type="text"
-            value={destination.state.name}
-            onChange={(e) =>
-              handleDestinationChange(index, "area", e.target.value)
-            }
-            placeholder="Destination"
-            className="flex-1 border p-3.5 rounded-3xl"
-          /> */}
-          <input
-            type="text"
-            value={destination.area}
-            onChange={(e) =>
-              handleDestinationChange(index, "area", e.target.value)
-            }
-            placeholder="Destination"
-            className="flex-1 border p-3.5 rounded-3xl w-[40%]"
-          />
-          <input
-            type="text"
-            value={destination.cost}
-            onChange={(e) =>
-              handleDestinationChange(index, "cost", e.target.value)
-            }
-            placeholder="Fee"
-            className="w-[18%] border p-6 rounded"
-          />
-
-          <IoTrashBin
-            className="cursor-pointer"
-            onClick={() => removeDestination(index, destination.id)}
-          />
-
           <button
-            className="text-kikaeBlue mb-3"
-            onClick={() =>
-              handleUpdateLogistination(
-                logistic.id,
-                destination.id,
-                destination.area,
-                destination.cost,
-
-                destination?.state?.id
-              )
-            }
+            className="text-kikaeBlue font-medium px-4"
+            onClick={addDestination}
           >
-            <Check />
+            + Add
           </button>
         </div>
-      ))}
-      <button className="text-kikaeBlue mb-3" onClick={addDestination}>
-        + Add destination
-      </button>
+      </div>
 
       <input
         defaultValue={logistic?.phone}
@@ -279,11 +309,6 @@ function EditLogistics({
         placeholder="Company Contact Number"
         className="w-full border p-3.5 rounded-3xl mb-3"
       />
-      {/*     <input
-        type="text"
-        placeholder="WhatsApp Number"
-        className="w-full border p-3.5 rounded-3xl mb-3"
-      /> */}
       <input
         defaultValue={logistic?.email}
         value={logistic?.email || ""}
@@ -322,7 +347,7 @@ function EditLogistics({
         onClick={handleUpdateLogistic}
         className="w-full bg-kikaeBlue text-white p-3.5 rounded-3xl mb-2"
       >
-        {isLoading ? <Loader /> : "  update logistics provider"}
+        {isLoading ? <Loader /> : "update logistics provider"}
       </button>
       <button onClick={closeModal} className="w-full border p-3.5 rounded-3xl">
         Cancel

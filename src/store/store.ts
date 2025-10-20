@@ -9,17 +9,24 @@ import {
   OrdersState,
 } from "./slice/ordersSlice";
 import { RunwayAction, RunwaySlice, RunwayState } from "./slice/runwaySlice";
+import {
+  CreateOverviewSlice,
+  OverviewActions,
+  OverviewState,
+} from "./slice/overviewSlice";
 
 type StoreState = ChartState &
   UsersState &
   ModalState &
   OrdersState &
-  RunwayState;
+  RunwayState &
+  OverviewState;
 type StoreActions = ChartActions &
   UsersAction &
   ModalAction &
   OrdersAction &
-  RunwayAction;
+  RunwayAction &
+  OverviewActions;
 
 export const useBoundStore = create<StoreState & StoreActions>((...a) => ({
   ...createChartSlice(...a),
@@ -27,4 +34,5 @@ export const useBoundStore = create<StoreState & StoreActions>((...a) => ({
   ...createModalSlice(...a),
   ...createOrdersSlice(...a),
   ...RunwaySlice(...a),
+  ...CreateOverviewSlice(...a),
 }));

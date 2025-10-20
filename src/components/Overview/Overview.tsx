@@ -22,6 +22,8 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 import { FaPrint } from "react-icons/fa";
+import { useBoundStore } from "@/store/store";
+import { getChurnRate } from "@/types/getChurnRate";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -91,6 +93,8 @@ export default function Overview() {
   });
 
   const [users, setUsers] = useState([]);
+  //const churnRate = useBoundStore((state) => state.churnRate);
+  const setChurnRate = useBoundStore((state) => state.setChurnRate);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -185,6 +189,17 @@ export default function Overview() {
     dashboardStats.monthly_wishlist,
     dashboardStats.total_users,
   ]);
+  useEffect(() => {
+    const handleFetchChurnRates = async () => {
+      const result = await getChurnRate();
+
+      if (result) {
+        setChurnRate(result);
+      }
+    };
+
+    handleFetchChurnRates();
+  }, [setChurnRate]);
 
   const router = useRouter();
 
@@ -327,6 +342,25 @@ export default function Overview() {
             }}
           />
         </div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <StatCard title="Active users" value={"0"} />
+        <StatCard
+          title="Total categories"
+          value={categories?.length?.toLocaleString() || "0"}
+        />
+        <StatCard
+          title="Total users"
+          value={users?.length?.toLocaleString() || "0"}
+        />
+        <StatCard
+          title="Active orders"
+          value={dashboardStats?.active_orders?.toLocaleString() || "0"}
+        />
+        <StatCard
+          title="Completed orders"
+          value={dashboardStats?.completed_orders?.toLocaleString() || "0"}
+        />
       </div>
 
       <div className="p-4 border rounded-xl shadow bg-white">
