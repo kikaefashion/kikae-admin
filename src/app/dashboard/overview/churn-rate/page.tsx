@@ -1,8 +1,12 @@
 import ChurnedRate from "@/components/ChurnedRate";
-import React from "react";
+import React, { Suspense } from "react";
 
 const Page = () => {
-  return <ChurnedRate />;
+  return (
+    <Suspense>
+      <ChurnedRate />;
+    </Suspense>
+  );
 };
 
 export default Page;

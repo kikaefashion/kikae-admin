@@ -1,11 +1,11 @@
 import Overview from "@/components/Overview/Overview";
-import React, { Suspense } from "react";
+import React from "react";
 
 const page = () => {
   return (
-    <Suspense>
+    <div>
       <Overview />
-    </Suspense>
+    </div>
   );
 };
 
