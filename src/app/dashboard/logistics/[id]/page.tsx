@@ -1,8 +1,9 @@
-import LogisticsProviderDetails from "@/components/Logistic/LogisticDetail";
+import LogisticMetricStats from "@/components/Logistic/LogisticMetric";
+
 import React from "react";
 
 const page = () => {
-  return <LogisticsProviderDetails />;
+  return <LogisticMetricStats />;
 };
 
 export default page;

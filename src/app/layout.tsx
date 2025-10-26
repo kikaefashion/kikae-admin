@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import ToastComponent from "@/components/ToastComponent";
+import QueryProvider from "@/components/provider/QueryProvider";
 
 /* const dm_sans = DM_Sans({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const queryClient = new QueryClient();
   return (
     <html className={openSans.className} lang="en">
       <head>
@@ -56,9 +58,11 @@ export default function RootLayout({
         />
       </head>
       <body className={` antialiased bg-lightWhite`}>
-        <ToastComponent />
+        <QueryProvider>
+          <ToastComponent />
 
-        {children}
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

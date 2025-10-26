@@ -14,19 +14,26 @@ import {
   OverviewActions,
   OverviewState,
 } from "./slice/overviewSlice";
+import {
+  CreateLogisticSlice,
+  LogisticActions,
+  LogisticState,
+} from "./slice/logisticSlice";
 
 type StoreState = ChartState &
   UsersState &
   ModalState &
   OrdersState &
   RunwayState &
-  OverviewState;
+  OverviewState &
+  LogisticState;
 type StoreActions = ChartActions &
   UsersAction &
   ModalAction &
   OrdersAction &
   RunwayAction &
-  OverviewActions;
+  OverviewActions &
+  LogisticActions;
 
 export const useBoundStore = create<StoreState & StoreActions>((...a) => ({
   ...createChartSlice(...a),
@@ -35,4 +42,5 @@ export const useBoundStore = create<StoreState & StoreActions>((...a) => ({
   ...createOrdersSlice(...a),
   ...RunwaySlice(...a),
   ...CreateOverviewSlice(...a),
+  ...CreateLogisticSlice(...a),
 }));

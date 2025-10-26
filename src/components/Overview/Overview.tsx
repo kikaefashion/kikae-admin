@@ -22,8 +22,9 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 import { FaPrint } from "react-icons/fa";
-import { useBoundStore } from "@/store/store";
-import { getChurnRate } from "@/types/getChurnRate";
+
+import { getChurnOverview } from "@/networking/endpoints/overview/churnOverview";
+import type { ChurnOverviewType } from "@/types/ChurnOverviewType";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -43,6 +44,7 @@ export default function Overview() {
   >([]);
 
   const [products, setProducts] = useState<productData[]>([]);
+
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState<{
     total_products: number;
@@ -85,7 +87,21 @@ export default function Overview() {
     datasets: [],
   });
 
-  const [userEngagementData, setUserEngagementData] = useState<
+  const [activeUsersMonthlyData, setActiveUsersMonthlyData] = useState<
+    ChartData<"bar">
+  >({
+    labels: [],
+    datasets: [],
+  });
+
+  const [newUsersMonthlyData, setNewUsersMonthlyData] = useState<
+    ChartData<"bar">
+  >({
+    labels: [],
+    datasets: [],
+  });
+
+  const [wishlistMonthlyData, setWishlistMonthlyData] = useState<
     ChartData<"bar">
   >({
     labels: [],
@@ -93,8 +109,8 @@ export default function Overview() {
   });
 
   const [users, setUsers] = useState([]);
-  //const churnRate = useBoundStore((state) => state.churnRate);
-  const setChurnRate = useBoundStore((state) => state.setChurnRate);
+
+  const [churnRateSummary, setChurnRateSummary] = useState<ChurnOverviewType>();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -113,7 +129,6 @@ export default function Overview() {
   }, []);
 
   useEffect(() => {
-    // Process monthly revenue data
     const monthNames = [
       "January",
       "February",
@@ -151,35 +166,67 @@ export default function Overview() {
     });
 
     // Process user engagement data
-    const currentMonth = new Date().toISOString().slice(0, 7); // Format: "2025-07"
+    //  const currentMonth = new Date().toISOString().slice(0, 7); // Format: "2025-07"
 
     // Get new users for current month
-    const currentMonthNewUsers = dashboardStats.monthly_new_users.find(
-      (item) => item.month === currentMonth
-    );
-    const newUsersThisMonth = currentMonthNewUsers
-      ? Number.parseInt(currentMonthNewUsers.total_users)
-      : 0;
 
-    // Get wishlist adds for current month
-    const currentMonthWishlist = dashboardStats.monthly_wishlist.find(
-      (item) => item.month === currentMonth
-    );
-    const wishlistAddsThisMonth = currentMonthWishlist
-      ? Number.parseInt(currentMonthWishlist.total_likes)
-      : 0;
+    const monthlyActiveUsersData = new Array(12).fill(0);
+    dashboardStats.monthly_new_users.forEach((item) => {
+      const monthYear = item.month;
+      const monthIndex = Number.parseInt(monthYear.split("-")[1]) - 1;
+      if (monthIndex >= 0 && monthIndex < 12) {
+        // Accumulate users as a proxy for active users
+        monthlyActiveUsersData[monthIndex] = Number.parseInt(item.total_users);
+      }
+    });
 
-    // Calculate active users (you can modify this logic based on your needs)
-    // For now, using total users as a placeholder for active users
-    const activeUsersToday = dashboardStats.total_users;
-
-    setUserEngagementData({
-      labels: ["Active users today", "New users this month", "Wishlist adds"],
+    setActiveUsersMonthlyData({
+      labels: monthNames,
       datasets: [
         {
-          label: "Engagement",
-          data: [activeUsersToday, newUsersThisMonth, wishlistAddsThisMonth],
-          backgroundColor: ["#3B82F6", "#6EE7B7", "#F472B6"],
+          label: "Active Users",
+          data: monthlyActiveUsersData,
+          backgroundColor: "#3B82F6",
+        },
+      ],
+    });
+
+    const monthlyNewUsersData = new Array(12).fill(0);
+    dashboardStats.monthly_new_users.forEach((item) => {
+      const monthYear = item.month;
+      const monthIndex = Number.parseInt(monthYear.split("-")[1]) - 1;
+      if (monthIndex >= 0 && monthIndex < 12) {
+        monthlyNewUsersData[monthIndex] = Number.parseInt(item.total_users);
+      }
+    });
+
+    setNewUsersMonthlyData({
+      labels: monthNames,
+      datasets: [
+        {
+          label: "New Users",
+          data: monthlyNewUsersData,
+          backgroundColor: "#6EE7B7",
+        },
+      ],
+    });
+
+    const monthlyWishlistData = new Array(12).fill(0);
+    dashboardStats.monthly_wishlist.forEach((item) => {
+      const monthYear = item.month;
+      const monthIndex = Number.parseInt(monthYear.split("-")[1]) - 1;
+      if (monthIndex >= 0 && monthIndex < 12) {
+        monthlyWishlistData[monthIndex] = Number.parseInt(item.total_likes);
+      }
+    });
+
+    setWishlistMonthlyData({
+      labels: monthNames,
+      datasets: [
+        {
+          label: "Wishlist Adds",
+          data: monthlyWishlistData,
+          backgroundColor: "#F472B6",
         },
       ],
     });
@@ -191,15 +238,15 @@ export default function Overview() {
   ]);
   useEffect(() => {
     const handleFetchChurnRates = async () => {
-      const result = await getChurnRate();
+      const result = await getChurnOverview(30);
 
       if (result) {
-        setChurnRate(result);
+        setChurnRateSummary(result);
       }
     };
 
     handleFetchChurnRates();
-  }, [setChurnRate]);
+  }, []);
 
   const router = useRouter();
 
@@ -260,12 +307,19 @@ export default function Overview() {
 
         <div>
           <div
-            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2"
+            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2 g"
             onClick={handlePrint}
           >
             <span className="text-kikaeBlue font-bold mr-2">Print</span>
             <FaPrint />
           </div>
+
+          <button
+            onClick={() => router.push("/dashboard/overview/churn-rate")}
+            className="border rounded-3xl py-[0.625rem] px-[0.875rem] text-[#AAA5A4;] bg-white"
+          >
+            View Churn rate
+          </button>
 
           <button
             onClick={() => router.push("/dashboard/pending-actions")}
@@ -320,22 +374,10 @@ export default function Overview() {
             }}
           />
         </div>
-
         <div className="p-4 border rounded-xl shadow bg-white">
-          <h2 className="text-lg font-semibold mb-2">User engagement</h2>
-          <div className="text-sm text-gray-500 mb-2">
-            New users this month:{" "}
-            {dashboardStats.monthly_new_users.find(
-              (item) => item.month === new Date().toISOString().slice(0, 7)
-            )?.total_users || "0"}
-            <br />
-            Wishlist adds:{" "}
-            {dashboardStats.monthly_wishlist.find(
-              (item) => item.month === new Date().toISOString().slice(0, 7)
-            )?.total_likes || "0"}
-          </div>
+          <h2 className="text-lg font-semibold mb-2">Active Users per Month</h2>
           <Bar
-            data={userEngagementData}
+            data={activeUsersMonthlyData}
             options={{
               responsive: true,
               plugins: { legend: { display: false } },
@@ -343,23 +385,61 @@ export default function Overview() {
           />
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-4 border rounded-xl shadow bg-white">
+          <h2 className="text-lg font-semibold mb-2">New Users per Month</h2>
+          New users this month:{" "}
+          {dashboardStats.monthly_new_users.find(
+            (item) => item.month === new Date().toISOString().slice(0, 7)
+          )?.total_users || "0"}
+          <Bar
+            data={newUsersMonthlyData}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: false } },
+            }}
+          />
+        </div>
+
+        <div className="p-4 border rounded-xl shadow bg-white">
+          <h2 className="text-lg font-semibold mb-2">
+            Wishlist Adds per Month
+          </h2>
+          Wishlist adds:{" "}
+          {dashboardStats.monthly_wishlist.find(
+            (item) => item.month === new Date().toISOString().slice(0, 7)
+          )?.total_likes || "0"}
+          <Bar
+            data={wishlistMonthlyData}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: false } },
+            }}
+          />
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard title="Active users" value={"0"} />
+        <StatCard title="30-day Churn rate" value={"% of inactive users"} />
+
         <StatCard
-          title="Total categories"
-          value={categories?.length?.toLocaleString() || "0"}
+          title="Active users"
+          value={churnRateSummary?.active_users.toString() || "0"}
         />
         <StatCard
-          title="Total users"
-          value={users?.length?.toLocaleString() || "0"}
+          title="Churned users"
+          value={churnRateSummary?.churned_users.toString() || "0"}
         />
         <StatCard
-          title="Active orders"
-          value={dashboardStats?.active_orders?.toLocaleString() || "0"}
+          title="Churn Rate"
+          value={churnRateSummary?.churn_rate.toString() || "0"}
         />
         <StatCard
-          title="Completed orders"
-          value={dashboardStats?.completed_orders?.toLocaleString() || "0"}
+          title="Period"
+          value={`${churnRateSummary?.period.start.toLocaleString()} - ${
+            churnRateSummary?.period.end
+          }  `}
         />
       </div>
 
@@ -390,22 +470,6 @@ export default function Overview() {
                   </tr>
                 );
               })}
-            {/*  <tr className="border-b">
-              <td className="py-2">2</td>
-              <td className="py-2 text-blue-600 underline cursor-pointer">
-                Women&apos;s Clothing
-              </td>
-              <td className="py-2">₦950,000</td>
-              <td className="py-2">280</td>
-            </tr>
-            <tr>
-              <td className="py-2">3</td>
-              <td className="py-2 text-blue-600 underline cursor-pointer">
-                Footwear
-              </td>
-              <td className="py-2">₦600,000</td>
-              <td className="py-2">150</td>
-            </tr> */}
           </tbody>
         </table>
       </div>
@@ -416,8 +480,8 @@ export default function Overview() {
 function StatCard({ title, value }: StatCardProps) {
   return (
     <div className="p-4 bg-white shadow rounded-xl border">
-      <div className="text-gray-500 text-sm mb-1">{title}</div>
-      <div className="text-lg font-semibold">{value}</div>
+      <div className=" mb-1 font-semibold text-lg">{title}</div>
+      <div className="text-gray-500 text-sm ">{value}</div>
     </div>
   );
 }

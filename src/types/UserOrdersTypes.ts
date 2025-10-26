@@ -1,3 +1,4 @@
+import { LogisticsType } from "./logisticsType";
 import { productData } from "./ProductType";
 import { UserProfileType } from "./types";
 
@@ -50,7 +51,7 @@ export type OrderItem = {
   longitude: number | null;
   length: number | null;
   location: string | null;
-  logistic: string;
+  logistic: LogisticsType;
   logistic_id: number | null;
   neck: string;
   note: string | null;
