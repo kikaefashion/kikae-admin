@@ -56,7 +56,11 @@ const Users = () => {
                   <td className="p-3">{user.phone}</td>
                   <td className="p-3">
                     <img
-                      src={mediaUrlPrefix + user?.profilePic}
+                      src={
+                        mediaUrlPrefix && user.profilePic
+                          ? mediaUrlPrefix + user?.profilePic
+                          : ""
+                      }
                       alt="Profile"
                       className="w-8 h-8 rounded-full"
                     />
