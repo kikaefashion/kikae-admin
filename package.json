@@ -17,7 +17,10 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
+    "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-query": "^5.90.5",
@@ -33,7 +36,7 @@
     "react-awesome-reveal": "^4.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "19.1.0",
-    "react-hook-form": "^7.53.1",
+    "react-hook-form": "^7.66.0",
     "react-icons": "^5.5.0",
     "react-loader-spinner": "^6.1.6",
     "react-toastify": "^10.0.6",
@@ -41,6 +44,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "universal-cookie": "^7.2.2",
+    "zod": "^4.1.12",
     "zustand": "^5.0.1"
   },
   "devDependencies": {

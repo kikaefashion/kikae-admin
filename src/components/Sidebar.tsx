@@ -30,6 +30,11 @@ const sidebarContents = [
     link: "/orders",
   },
   {
+    title: "Promos",
+    icon: "",
+    link: "/promos",
+  },
+  {
     title: "notifications",
     icon: "",
     link: "/notifications",
