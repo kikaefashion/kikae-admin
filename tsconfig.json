@@ -14,7 +14,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -36,7 +36,8 @@
     "src/app/dashboard/users/[id]",
     "src/app/dashboard/users/audit_trail",
     "src/components/Categories",
-    "src/app/dashboard/runway/[id]"
+    "src/app/dashboard/runway/[id]",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
