@@ -60,8 +60,8 @@ export default function UpdateCouponPage() {
       console.log("Created Coupon:", result);
       router.back();
       form.reset();
-    } catch (err: any) {
-      alert(err.message || "Something went wrong");
+    } catch {
+      alert("Something went wrong");
     } finally {
       setLoading(false);
     }
