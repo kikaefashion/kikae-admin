@@ -27,6 +27,8 @@ const Users = () => {
       setUsers(filteredUsers);
     }
   };
+
+  const imgPrefix = mediaUrlPrefix || "";
   return (
     <div className="pt-6 pr-6">
       <div className="p-4 shadow-lg rounded-3xl text-black ">
@@ -56,11 +58,7 @@ const Users = () => {
                   <td className="p-3">{user.phone}</td>
                   <td className="p-3">
                     <img
-                      src={
-                        mediaUrlPrefix && user.profilePic
-                          ? mediaUrlPrefix + user?.profilePic
-                          : ""
-                      }
+                      src={imgPrefix + user?.profilePic}
                       alt="Profile"
                       className="w-8 h-8 rounded-full"
                     />
