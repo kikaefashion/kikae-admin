@@ -57,7 +57,7 @@ export default function CreateCouponPage() {
       console.log("Created Coupon:", result);
       router.back();
       form.reset();
-    } catch () {
+    } catch {
       alert("Something went wrong");
     } finally {
       setLoading(false);
