@@ -19,6 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { OrdersResponseType } from "@/types/apiResponseType/OrdersResponseType";
 
 const filters = ["Order ID", "Keyword", "Status", "Items"];
 const orderStatuses = [
@@ -53,7 +54,7 @@ function FashionStore({}) {
   const [allOrders, setAllOrders] = useState<OrderItem[]>([]); */
   const [initialLoading, setInitialLoading] = useState(true);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const searchParams = useSearchParams();
   const page = searchParams.get("page");
@@ -61,7 +62,9 @@ function FashionStore({}) {
     (state) => state.setTransactionFees
   );
 
-  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [ordersResponse, setOrdersResponse] =
+    useState<OrdersResponseType | null>(null);
+
   const [financialStats, setFinancialStats] = useState([
     { label: "Total sales", amount: 0 },
     { label: "Pending payouts", amount: 0 },
@@ -149,16 +152,20 @@ function FashionStore({}) {
 
       const statusParam = filters.status ? filters.status.join(",") : undefined;
 
-      const orders = await getAllOrders(
+      const response = await getAllOrders(
+        currentPage,
         filters.keyword,
         filters.start_date,
         filters.end_date,
         statusParam
       );
 
-      // setAllOrders(orders.data);
-      const filteredOrders = applyFrontendFilters(orders.data);
-      setOrders(filteredOrders);
+      const filteredOrders = applyFrontendFilters(response.data);
+
+      setOrdersResponse({
+        ...response,
+        data: filteredOrders,
+      });
 
       console.log({ orders: filteredOrders, filters });
     } catch (error) {
@@ -166,7 +173,7 @@ function FashionStore({}) {
     } finally {
       // setLoading(false);
     }
-  }, [getCurrentFilters, applyFrontendFilters]);
+  }, [getCurrentFilters, applyFrontendFilters, currentPage]);
 
   const fetchFinancialStats = useCallback(async () => {
     try {
@@ -322,6 +329,11 @@ function FashionStore({}) {
       return;
     }
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    fetchFilteredOrders();
   };
 
   return (
@@ -490,12 +502,36 @@ function FashionStore({}) {
         <FinancialActivity
           isLoading={initialLoading}
           financialStats={financialStats}
-          orders={orders}
-          setOrders={setOrders}
+          ordersResponse={ordersResponse}
+          setOrders={setOrdersResponse}
         />
       )}
       {page == "vendor_payouts" && <PayoutTable />}
       {page == "transaction_fees_breakdown" && <FeeTable />}
+
+      {ordersResponse && (
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={!ordersResponse.prev_page_url}
+            onClick={() => goToPage(ordersResponse.current_page - 1)}
+            className="px-4 py-2 rounded-md border text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {ordersResponse.current_page} of {ordersResponse.last_page}
+          </span>
+
+          <button
+            disabled={!ordersResponse.next_page_url}
+            onClick={() => goToPage(ordersResponse.current_page + 1)}
+            className="px-4 py-2 rounded-md border text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

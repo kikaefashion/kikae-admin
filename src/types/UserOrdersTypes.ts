@@ -32,13 +32,8 @@ export type OrderItem = {
   bottom_length: string;
   chests: string;
   color: {
-    //  created_at: "2025-08-07T13:43:54.000000Z";
     id: number;
     name: string;
-    // product_id: "72";
-    //  updated_at: "2025-08-07T13:43:54.000000Z";
-    //  url: null;
-    //   value: "#000000";
   };
   colour: string | null;
   created_at: string;

@@ -1,22 +1,23 @@
 "use client";
 
 import { updateOrderStatus } from "@/networking/endpoints/Orders/updateOrderStatus";
-import type { OrderItem, orderStatus } from "@/types/UserOrdersTypes";
+import { OrdersResponseType } from "@/types/apiResponseType/OrdersResponseType";
+import type { orderStatus } from "@/types/UserOrdersTypes";
 import { useRouter } from "next/navigation";
 
 const FinancialActivity = ({
-  orders,
+  ordersResponse,
   financialStats,
   isLoading,
   setOrders,
 }: {
-  orders: OrderItem[];
+  ordersResponse: OrdersResponseType | null;
   financialStats: {
     label: string;
     amount: number;
   }[];
   isLoading: boolean;
-  setOrders: (value: OrderItem[]) => void;
+  setOrders: (value: OrdersResponseType) => void;
 }) => {
   const router = useRouter();
   const goToProductPage = (productId: string | number, type: string) => {
@@ -28,9 +29,25 @@ const FinancialActivity = ({
     selectedStatus: orderStatus
   ) => {
     updateOrderStatus(id, selectedStatus);
-    const filteredOrders = orders.filter((item) => item.id != id);
+    const filteredOrders =
+      ordersResponse?.data.filter((item) => item.id != id) ?? [];
 
-    setOrders(filteredOrders);
+    setOrders({
+      ...(ordersResponse ?? {}),
+      data: filteredOrders,
+      current_page: ordersResponse?.current_page ?? 1,
+      first_page_url: ordersResponse?.first_page_url ?? "",
+      from: ordersResponse?.from ?? 0,
+      last_page: ordersResponse?.last_page ?? 0,
+      last_page_url: ordersResponse?.last_page_url ?? "",
+      links: ordersResponse?.links ?? [],
+      next_page_url: ordersResponse?.next_page_url ?? null,
+      path: ordersResponse?.path ?? "",
+      per_page: ordersResponse?.per_page ?? 0,
+      prev_page_url: ordersResponse?.prev_page_url ?? null,
+      to: ordersResponse?.to ?? 0,
+      total: ordersResponse?.total ?? 0,
+    });
   };
 
   const Action = ({ id, status }: { id: number; status: orderStatus }) => {
@@ -103,7 +120,7 @@ const FinancialActivity = ({
     );
   }
 
-  if (!orders || orders.length === 0) {
+  if (!ordersResponse || ordersResponse.data.length === 0) {
     return (
       <div>
         {/* Financial stats still show even when no orders */}
@@ -193,7 +210,7 @@ const FinancialActivity = ({
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {ordersResponse.data.map((order) => (
               //  console.log({order:order.size})
               <tr key={order.id} className=" hover:bg-gray-100er">
                 <td className=" p-2">{order.id}</td>
