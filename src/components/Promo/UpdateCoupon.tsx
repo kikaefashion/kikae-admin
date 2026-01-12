@@ -25,24 +25,26 @@ const couponSchema = z.object({
   code: z.string().optional(),
   type: z.enum(["percentage", "amount"]),
 
-  value: z.coerce.number().min(1, "Value must be greater than 0"),
-  min_price_rule: z.coerce.number().optional(),
-  max_price_rule: z.coerce.number().optional(),
+  value: z.number().min(1, "Value must be greater than 0"),
+  min_price_rule: z.number().optional(),
+  max_price_rule: z.number().optional(),
   applied_to: z.enum(["logistics", "orders", "all"]),
-  usage_days: z.coerce.number().optional(),
-  max_users: z.coerce.number().optional(),
+  usage_days: z.number().optional(),
+  max_users: z.number().optional(),
   expiry_date: z.string().optional(),
   allow_multiple: z.enum(["0", "1"]),
 });
 
 type CouponFormData = z.infer<typeof couponSchema>;
+type CouponFormInput = z.input<typeof couponSchema>;
 
 export default function UpdateCouponPage() {
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const form = useForm<CouponFormData>({
+
+  const form = useForm<CouponFormInput>({
     resolver: zodResolver(couponSchema),
     defaultValues: {
       name: "",
