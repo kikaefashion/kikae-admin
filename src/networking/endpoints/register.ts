@@ -1,4 +1,5 @@
 import { baseUrl } from "../apiUrl";
+import Cookies from "universal-cookie";
 
 export const handleRegisterAdmin = async (
   email: string,
@@ -7,11 +8,14 @@ export const handleRegisterAdmin = async (
   name: string
 ) => {
   try {
+    const cookies = new Cookies();
+    const authToken = cookies.get("authToken");
     const response = await fetch(`${baseUrl}/admin/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         email,

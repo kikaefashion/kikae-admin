@@ -13,7 +13,7 @@ import React, { useEffect } from "react";
 const ApprovedVendors = () => {
   const router = useRouter();
   const goToVendorPage = (id: string) => {
-    router.push(`/dashboard/users/vendors/${id}?page=products`);
+    router.push(`/dashboard/vendors/${id}?page=products`);
   };
 
   const setApprovedVendors = useBoundStore((state) => state.setApprovedVendors);

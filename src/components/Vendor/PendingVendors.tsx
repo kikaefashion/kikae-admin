@@ -9,7 +9,7 @@ import { approveVendorStore } from "@/networking/endpoints/vendors/approveVendor
 const PendingVendors = () => {
   const router = useRouter();
   const goToVendorPage = (id: string) => {
-    router.push(`/dashboard/users/vendors/${id}?page=products`);
+    router.push(`/dashboard/vendors/${id}?page=products`);
   };
   const [isVisible, setIsVisible] = useState(false);
   const pendingVendors = useBoundStore((state) => state.pendingVendors);

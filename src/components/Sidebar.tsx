@@ -20,6 +20,11 @@ const sidebarContents = [
     link: "/users?type=buyers&&page=1",
   },
   {
+    title:"vendors",
+    icon:'',
+    link:"/vendors?type=vendors&&status=approved&&page=1"
+  },
+  {
     title: "products",
     icon: "",
     link: "/products?type=items&&status=approved&&page=1",
