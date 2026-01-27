@@ -2,11 +2,17 @@
 
 import AllVendors from '@/components/Vendor/AllVendors';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react'
+import React, { Suspense } from 'react'
+
+const Page= ()=>{
+  return (<Suspense fallback={<div>Loading...</div>}>
+    <VendorsPage/>
+  </Suspense>)
+}
 
 
 
-const Page = () => {
+const VendorsPage = () => {
      const router = useRouter();
       const status = useSearchParams().get("status");
         
