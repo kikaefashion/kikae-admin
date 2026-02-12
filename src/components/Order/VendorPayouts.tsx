@@ -77,7 +77,7 @@ export default function PayoutTable() {
     );
   }
 
-  if (payoutData.length == 0) {
+  if (payoutData?.length == 0) {
     return (
       <div className="p-6 bg-white shadow-md rounded-lg">
         <table className="w-full">
@@ -145,7 +145,7 @@ export default function PayoutTable() {
           </tr>
         </thead>
         <tbody>
-          {payoutData.map((item, index: number) => (
+          {payoutData && payoutData.map((item, index: number) => (
             <tr key={index} className="text-center">
               <td
                 onClick={() => {
