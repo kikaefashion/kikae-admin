@@ -185,14 +185,13 @@ function VendorStore() {
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`px-4 py-2 text-sm rounded-3xl capitalize ${
-              page === tab
+            className={`px-4 py-2 text-sm rounded-3xl capitalize ${page === tab
                 ? "bg-kikaeBlue text-white"
                 : "bg-white text-kikaeGrey"
-            }`}
+              }`}
             onClick={() =>
               router.replace(
-                `/dashboard/users/vendors/${params.id}?page=${tab}`
+                `/dashboard/vendors/${params.id}?page=${tab}`
               )
             }
           >
