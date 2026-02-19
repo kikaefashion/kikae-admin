@@ -52,7 +52,7 @@ export default function CreateAdminUser() {
       if (!result) return;
 
       setAdmin(result.admins[0]);
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {

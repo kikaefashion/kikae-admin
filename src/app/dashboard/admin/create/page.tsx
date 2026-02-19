@@ -1,6 +1,6 @@
 "use client";
 import { ArrowBack } from "@/assets/ArrowBack";
-import Loader from "@/components/Loader";
+
 import { handleRegisterAdmin } from "@/networking/endpoints/register";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -51,7 +51,7 @@ export default function CreateAdminUser() {
           type="button"
           className="bg-blue-600 text-white px-6 py-2 rounded-full"
         >
-          {isLoading ? <Loader /> : "Create admin user"}
+          {"Create admin user"}
         </button>
       </div>
 
