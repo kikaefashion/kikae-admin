@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Loader from "@/components/Loader";
@@ -15,7 +15,7 @@ type FormData = {
 
 const Login = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
