@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/components/Loader";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -89,7 +88,7 @@ const Register = () => {
           disabled={isLoading}
           className="bg-kikaeBlue  rounded-4xl p-2.5 mx-auto mt-6 justify-center w-[10.375rem]"
         >
-          {isLoading ? <Loader /> : "Create an account"}
+          {"Create an account"}
         </button>
       </form>
       <p className="text-center text-black mt-6">
