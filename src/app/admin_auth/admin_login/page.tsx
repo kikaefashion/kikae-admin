@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 
-//import Loader from "@/components/Loader";
+import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 
 type FormData = {
@@ -15,7 +15,7 @@ type FormData = {
 
 const Login = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const {
     register,
@@ -83,7 +83,7 @@ const Login = () => {
           disabled={isLoading}
           className="bg-kikaeBlue w-36 rounded-4xl p-2.5 mx-auto mt-6 justify-center"
         >
-          {"Login"}
+          {isLoading ? <Loader /> : "  Login"}
         </button>
       </form>
       <div className="flex flex-row justify-between items-center">
