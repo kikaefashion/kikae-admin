@@ -104,7 +104,7 @@ const FinancialActivity = ({
 
     if (normalizeStatus(status.toLocaleLowerCase()) == ORDER_STATUS.READY_FOR_DELIVERY) {
       return (
-        <button onClick={() => handleStatusChangeWithConfirmation(id, "dispatched", "Are you sure you want to dispatch this order?")}>
+        <button className="underline" onClick={() => handleStatusChangeWithConfirmation(id, "dispatched", "Are you sure you want to dispatch this order?")}>
           Dispatch
         </button>
       );
@@ -112,7 +112,7 @@ const FinancialActivity = ({
 
     if (normalizeStatus(status.toLocaleLowerCase()) == ORDER_STATUS.DISPATCHED) {
       return (
-        <button onClick={() => handleStatusChangeWithConfirmation(id, "delivered", "Are you sure you want to confirm delivery for this order?")}>
+        <button className="underline" onClick={() => handleStatusChangeWithConfirmation(id, "delivered", "Are you sure you want to confirm delivery for this order?")}>
           Confirm Delivery
         </button>
       );
