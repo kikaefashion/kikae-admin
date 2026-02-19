@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Loader from "@/components/Loader";
+//import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 
 type FormData = {
@@ -83,7 +83,7 @@ const Login = () => {
           disabled={isLoading}
           className="bg-kikaeBlue w-36 rounded-4xl p-2.5 mx-auto mt-6 justify-center"
         >
-          {isLoading ? <Loader /> : "  Login"}
+          {"Login"}
         </button>
       </form>
       <div className="flex flex-row justify-between items-center">

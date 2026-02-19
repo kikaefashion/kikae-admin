@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Loader from "@/components/Loader";
+//import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 
 import Cookies from "universal-cookie";
@@ -88,7 +88,7 @@ const Login = () => {
           disabled={isLoading}
           className="bg-kikaeBlue w-36 rounded-4xl p-2.5 mx-auto mt-6 text-white justify-center"
         >
-          {isLoading ? <Loader /> : "Proceed"}
+          {"Proceed"}
         </button>
       </form>
       <Link href={"/"} className="text-kikaeBlue text-right">
