@@ -1,9 +1,12 @@
 "use client";
 
+import { normalizeStatus, ORDER_STATUS, SERVICE_STATUS } from "@/lib/utils";
 import { updateOrderStatus } from "@/networking/endpoints/Orders/updateOrderStatus";
 import { OrdersResponseType } from "@/types/apiResponseType/OrdersResponseType";
 import type { orderStatus } from "@/types/UserOrdersTypes";
 import { useRouter } from "next/navigation";
+import { ConfirmationDialog } from "./ConfrimationDialog";
+import { useState } from "react";
 
 const FinancialActivity = ({
   ordersResponse,
@@ -20,6 +23,15 @@ const FinancialActivity = ({
   setOrders: (value: OrdersResponseType) => void;
 }) => {
   const router = useRouter();
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    orderId?: number;
+    selectedStatus?: orderStatus;
+  }>({
+    isOpen: false,
+    title: "",
+  });
   const goToProductPage = (productId: string | number, type: string) => {
     router.push(`/dashboard/products/${productId}?type=${type}`);
   };
@@ -28,13 +40,19 @@ const FinancialActivity = ({
     id: number,
     selectedStatus: orderStatus
   ) => {
-    updateOrderStatus(id, selectedStatus);
-    const filteredOrders =
-      ordersResponse?.data.filter((item) => item.id != id) ?? [];
+    const result = await updateOrderStatus(id, selectedStatus);
+
+    console.log({ result })
+
+    if (!result) return false
+    const updatedOrders =
+      ordersResponse?.data.map((item) =>
+        item.id === id ? { ...item, status: selectedStatus } : item
+      ) ?? [];
 
     setOrders({
       ...(ordersResponse ?? {}),
-      data: filteredOrders,
+      data: updatedOrders,
       current_page: ordersResponse?.current_page ?? 1,
       first_page_url: ordersResponse?.first_page_url ?? "",
       from: ordersResponse?.from ?? 0,
@@ -50,34 +68,75 @@ const FinancialActivity = ({
     });
   };
 
+
+
+  const handleStatusChangeWithConfirmation = (
+    id: number,
+    selectedStatus: orderStatus,
+    title: string
+  ) => {
+    setConfirmDialog({
+      isOpen: true,
+      title,
+      orderId: id,
+      selectedStatus,
+    });
+  };
+
+  const handleConfirmStatusChange = () => {
+    if (
+      confirmDialog.orderId !== undefined &&
+      confirmDialog.selectedStatus !== undefined
+    ) {
+      handleUpdateOrderStatus(confirmDialog.orderId, confirmDialog.selectedStatus);
+      setConfirmDialog({ isOpen: false, title: "" });
+    }
+  };
+
+  const handleCancelStatusChange = () => {
+    setConfirmDialog({ isOpen: false, title: "" });
+  };
+
   const Action = ({ id, status }: { id: number; status: orderStatus }) => {
-    if (status.toLocaleLowerCase() == "order placed") {
+    if (normalizeStatus(status.toLocaleLowerCase()) == ORDER_STATUS.ORDER_PLACED) {
       return <button>Pending Vendor Confirmation</button>;
     }
 
-    if (status.toLocaleLowerCase() == "ready for delivery") {
+    if (normalizeStatus(status.toLocaleLowerCase()) == ORDER_STATUS.READY_FOR_DELIVERY) {
       return (
-        <button onClick={() => handleUpdateOrderStatus(id, "dispatched")}>
+        <button onClick={() => handleStatusChangeWithConfirmation(id, "dispatched", "Are you sure you want to dispatch this order?")}>
           Dispatch
         </button>
       );
     }
 
-    if (status.toLocaleLowerCase() == "dispatched") {
+    if (normalizeStatus(status.toLocaleLowerCase()) == ORDER_STATUS.DISPATCHED) {
       return (
-        <button onClick={() => handleUpdateOrderStatus(id, "delivered")}>
+        <button onClick={() => handleStatusChangeWithConfirmation(id, "delivered", "Are you sure you want to confirm delivery for this order?")}>
           Confirm Delivery
         </button>
       );
-    }
-
-    if (status.toLocaleLowerCase() == "confirmed") {
-      return <button>Confirmed</button>;
-    }
-
-    if (status.toLocaleLowerCase() == "delivered") {
+    } if (status.toLocaleLowerCase() == ORDER_STATUS.DELIVERED) {
       return <button>Delivered</button>;
     }
+
+    if (status.toLocaleLowerCase() == SERVICE_STATUS.SERVICE_PENDING) {
+      return <button>Confirmed</button>;
+    }
+    if (status.toLocaleLowerCase() == SERVICE_STATUS.SERVICE_BOOKED) {
+      return <button>
+        Pending Customer Confirmation
+      </button>;
+    }
+
+    if (status.toLocaleLowerCase() == SERVICE_STATUS.SETTLED) {
+      return <button>
+        Pending Customer Confirmation
+      </button>;
+    }
+
+
+
     return null;
   };
 
@@ -177,6 +236,12 @@ const FinancialActivity = ({
 
   return (
     <div>
+      <ConfirmationDialog isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={handleCancelStatusChange}
+        confirmText="Yes"
+        cancelText="No" />
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
         {financialStats &&
           financialStats.map((stat) => (
@@ -238,17 +303,16 @@ const FinancialActivity = ({
                 <td className=" p-2">{order.sizes.size}</td>
                 <td className=" p-2">{order.units}</td>
                 <td
-                  className={` p-2 font-bold ${
-                    order.status?.toLocaleLowerCase() === "delivered"
-                      ? "text-green-600"
-                      : order.status?.toLocaleLowerCase() === "out for delivery"
+                  className={`capitalize p-2 font-bold ${order.status?.toLocaleLowerCase() === "delivered"
+                    ? "text-green-600"
+                    : order.status?.toLocaleLowerCase() === "out for delivery"
                       ? "text-orange-500"
                       : order.status?.toLocaleLowerCase() === "returned"
-                      ? "text-red-500"
-                      : "text-blue-500"
-                  }`}
+                        ? "text-red-500"
+                        : "text-blue-500"
+                    }`}
                 >
-                  {order.status}
+                  {order.status?.replace(/_/g, " ")}
                 </td>
                 <td className=" p-2 text-kikaeGrey underline cursor-pointer">
                   <Action id={order.id} status={order.status} />
