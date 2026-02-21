@@ -12,10 +12,13 @@ export interface payoutRequestType {
     bank: string;
     bank_code: number;
     created_at: string;
-    user: UserProfileType;
+    
     id: number;
     payout_method: "Paystack";
+    status:1|0
     updated_at: string;
+    user: UserProfileType;
     user_id: string;
+
   };
 }

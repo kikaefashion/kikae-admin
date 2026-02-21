@@ -1,28 +1,24 @@
 import { baseUrl } from "@/networking/apiUrl";
+import Cookies from "universal-cookie";
 
 //import { NotificationManager } from "@/components/customNotification/NotificationManager";
 
 export const withdraw = async (
-  name: string,
-  account_number: number,
-  bank_code: number,
-  amount: number,
-  user_id: string
+id:number
 ) => {
   try {
-    console.log(amount, account_number, bank_code, name);
-    const response = await fetch(`${baseUrl}/paystack/transfer`, {
+    const cookies = new Cookies()
+    const token = cookies.get("authToken")
+
+    const response = await fetch(`${baseUrl}/admin/pending_withdraw/accept`, {
       method: "POST",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
+        Authorization:`Bearer ${token}`
       },
       body: JSON.stringify({
-        name,
-        account_number,
-        bank_code,
-        amount,
-        user_id,
+        id
       }),
     });
     const result = await response.json();
