@@ -10,10 +10,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getProducts } from "@/networking/endpoints/products/getProducts";
-import type { productData } from "@/types/ProductType";
+
 import { getCategories } from "@/networking/endpoints/categories/getCategories";
-import { getAllUsers } from "@/networking/endpoints/users/getAllUsers";
+
 import { getDashboardStats } from "@/networking/endpoints/overview/dashboardStats";
 import type { userAddress, UserProfileType } from "@/types/types";
 import { useRouter } from "next/navigation";
@@ -43,7 +42,7 @@ export default function Overview() {
     }[]
   >([]);
 
-  const [products, setProducts] = useState<productData[]>([]);
+  //const [products, setProducts] = useState<productData[]>([]);
 
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState<{
@@ -108,18 +107,16 @@ export default function Overview() {
     datasets: [],
   });
 
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
 
   const [churnRateSummary, setChurnRateSummary] = useState<ChurnOverviewType>();
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const products = await getProducts();
-      setProducts(products.data);
+
       const categories = await getCategories();
       setCategories(categories.data);
-      const users = await getAllUsers();
-      setUsers(users.users);
+
       const result = await getDashboardStats();
       setDashboardStats(result);
       const categoriesSalesResult = await getCategoriesSales();
@@ -332,15 +329,15 @@ export default function Overview() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
           title="Total products"
-          value={products?.length?.toLocaleString() || "0"}
+          value={dashboardStats?.total_products?.toLocaleString() || "0"}
         />
         <StatCard
           title="Total categories"
-          value={categories?.length?.toLocaleString() || "0"}
+          value={dashboardStats?.total_categories?.toLocaleString() || "0"}
         />
         <StatCard
           title="Total users"
-          value={users?.length?.toLocaleString() || "0"}
+          value={dashboardStats?.total_users?.toLocaleString() || "0"}
         />
         <StatCard
           title="Active orders"
@@ -437,9 +434,8 @@ export default function Overview() {
         />
         <StatCard
           title="Period"
-          value={`${churnRateSummary?.period.start.toLocaleString()} - ${
-            churnRateSummary?.period.end
-          }  `}
+          value={`${churnRateSummary?.period.start.toLocaleString()} - ${churnRateSummary?.period.end
+            }  `}
         />
       </div>
 

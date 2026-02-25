@@ -1,10 +1,10 @@
 import Cookies from "universal-cookie";
 import { baseUrl } from "../apiUrl";
 
-export const sendGeneralNotiification = async (title: string, body: string) => {
+export const sendGeneralNotiification = async (title: string, body: string,destination:string[]) => {
   const cookies = new Cookies();
   const authToken = cookies.get("authToken");
-  const response = await fetch(`${baseUrl}/send-to-users`, {
+  const response = await fetch(`${baseUrl}/admin/send-to-users`, {
     method: "POST",
     headers: {
       accept: "application/json",
@@ -16,7 +16,7 @@ export const sendGeneralNotiification = async (title: string, body: string) => {
       title,
       body,
 
-      user_id: ["all"],
+      user_id:destination,
     }),
   });
 

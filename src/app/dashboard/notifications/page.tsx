@@ -2,6 +2,7 @@
 
 import Loader from "@/components/Loader";
 import { sendGeneralNotiification } from "@/networking/endpoints/notification";
+import { CheckCircleIcon, Circle } from "lucide-react";
 import { useState } from "react";
 
 export default function Dashboard() {
@@ -9,12 +10,11 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  //const [addButton, setAddButton] = useState(false);
-  //const [addImage, setAddImage] = useState(false);
-
+  const [selectedDestination, setSelectedDestination] = useState("all")
+  const destinations = ["all", "vendors", "customers"]
   const handleSendNotifications = async () => {
     setIsLoading(true);
-    await sendGeneralNotiification(title, message);
+    await sendGeneralNotiification(title, message, [selectedDestination]);
     setIsLoading(false);
   };
 
@@ -43,29 +43,32 @@ export default function Dashboard() {
             onChange={(e) => setMessage(e.target.value)}
             className="w-full border p-2 rounded h-24"
           />
-          {/*   <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={addButton}
-              onChange={() => setAddButton(!addButton)}
-            />
-            <label>Add a button</label>
+
+          <div className="flex justify-between">
+
+            {
+              destinations.map(item => {
+                return <div onClick={() => { setSelectedDestination(item) }} className="flex cursor-pointer items-center gap-2.5" >
+                  {selectedDestination == item ? <CheckCircleIcon /> : <Circle />}
+                  {
+                    item
+                  }
+                </div>
+              })
+            }
+
           </div>
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={addImage}
-              onChange={() => setAddImage(!addImage)}
-            />
-            <label>Add an image</label>
-          </div> */}
+
+
+
+
           <button
             disabled={isLoading}
             type="button"
             onClick={handleSendNotifications}
             className="bg-blue-600 text-white px-4 py-2 rounded-full"
           >
-            {isLoading ? <Loader /> : "Send notification to all users"}
+            {isLoading ? <Loader /> : "Send notification"}
           </button>
         </div>
         <div className="p-6 bg-white rounded-xl shadow">

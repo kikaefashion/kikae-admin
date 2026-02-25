@@ -1,7 +1,7 @@
 "use client";
 
 import { withdraw } from "@/networking/endpoints/Orders/approveWithdraw";
-import { deletePayoutRequest } from "@/networking/endpoints/Orders/deletePayoutRequest";
+import { declinePayoutRequest } from "@/networking/endpoints/Orders/declinePayoutRequest";
 import { getPayoutRequests } from "@/networking/endpoints/Orders/getPayoutsRequests";
 import { payoutRequestType } from "@/types/pendingPayouts";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,7 @@ export default function PayoutTable() {
 
   const handleDeletePayoutRequest = async (id: number) => {
     try {
-      const result = await deletePayoutRequest(id);
+      const result = await declinePayoutRequest(id);
       if (!result) return;
       fetchPayoutData();
     } catch (error) {
@@ -102,8 +102,9 @@ export default function PayoutTable() {
         <thead className="text-kikaeBlue">
           <tr>
             <th className="p-3">Vendor name</th>
-            <th className="p-3">Pending payout (₦)</th>
-            <th className="p-3">Available Payout (₦)</th>
+            {activeStatus !== 2 && <th className="p-3">Requested Amount (₦)</th>}
+            {activeStatus == 2 && <th className="p-3">Pending payout (₦)</th>}
+            {activeStatus == 2 && <th className="p-3">Available Payout (₦)</th>}
             <th className="p-3">Total (₦)</th>
             <th className="p-3">Payout method</th>
             <th className="p-3">Bank</th>
@@ -124,12 +125,15 @@ export default function PayoutTable() {
                 >
                   {item?.withdraw_request?.user?.fname}
                 </td>
-                <td className="p-3">
+                {activeStatus !== 2 && <td className="p-3">
+                  ₦{item?.withdraw_request.amount_requested ?? "--"}
+                </td>}
+                {activeStatus == 2 && <td className="p-3">
                   ₦{item?.pending_balance?.toLocaleString()}
-                </td>
-                <td className="p-3">
+                </td>}
+                {activeStatus == 2 && <td className="p-3">
                   ₦{item?.withdrawable_balance?.toLocaleString()}
-                </td>
+                </td>}
                 <td className="p-3">₦{item?.total_sales?.toLocaleString()}</td>
                 <td className="p-3">{item?.withdraw_request?.payout_method}</td>
                 <td className="p-3">{item?.withdraw_request?.bank}</td>

@@ -11,6 +11,7 @@ export interface payoutRequestType {
     account_number: number;
     bank: string;
     bank_code: number;
+    amount_requested:number
     created_at: string;
     
     id: number;
