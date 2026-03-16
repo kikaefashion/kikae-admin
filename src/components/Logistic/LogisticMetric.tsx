@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,7 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import TableSkeleton from "../TableSkeleton";
 
-//import { deactivateUser } from "@/networking/endpoints/users/deactivateUser";
 import { getLogisticMetric } from "@/networking/endpoints/getLogisticMetric";
 import { useBoundStore } from "@/store/store";
 import { ChevronDown, X } from "lucide-react";
@@ -43,19 +42,49 @@ const LogisticMetricStats = () => {
 
   const router = useRouter();
 
-  // Safely narrow types
+  // Date filter state
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+
+  // Applied filter state — only updated when "Apply Now" is clicked
+  const [appliedStartDate, setAppliedStartDate] = useState<string>("");
+  const [appliedEndDate, setAppliedEndDate] = useState<string>("");
+
+  const today = new Date().toISOString().split("T")[0];
 
   const { data: logisticMetric, isLoading } = useQuery({
-    queryKey: ["logisticMetric", id],
-    queryFn: () => getLogisticMetric(id),
-    // enabled: !!type, // ensures it doesn't fetch before params are ready
+    queryKey: ["logisticMetric", id, appliedStartDate, appliedEndDate],
+    queryFn: () =>
+      getLogisticMetric(id, appliedStartDate || undefined, appliedEndDate || undefined),
   });
 
-  // const [churnRate] = results;
+  const resetFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setAppliedStartDate("");
+    setAppliedEndDate("");
+    setSearchTransactionId("");
+    router.push("?");
+  };
 
-  // ✅ helper to update URL params
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setStartDate(value);
+    // Auto-set end date to today if not already set
+    if (value && !endDate) {
+      setEndDate(today);
+    }
+    // Clear end date if start date is cleared
+    if (!value) {
+      setEndDate("");
+    }
+  };
 
-  const resetFilters = () => router.push("?");
+  const handleApply = () => {
+    setAppliedStartDate(startDate);
+    setAppliedEndDate(endDate);
+    setSearchTransactionIdDropdown(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -134,10 +163,7 @@ const LogisticMetricStats = () => {
                         {item.status}
                       </TableCell>
 
-                      <TableCell
-                        // onClick={() => setSelectedTransaction(item)}
-                        className="underline cursor-pointer"
-                      >
+                      <TableCell className="underline cursor-pointer">
                         View
                       </TableCell>
                     </TableRow>
@@ -161,7 +187,7 @@ const LogisticMetricStats = () => {
             onClick={() => setSearchTransactionIdDropdown(true)}
             className={`cursor-pointer ${"bg-white"} rounded-3xl py-2.5 px-3.5 transition-colors flex items-center `}
           >
-            Transaction Id
+            Date
             <ChevronDown />
           </div>
 
@@ -174,23 +200,57 @@ const LogisticMetricStats = () => {
         </div>
 
         {searchTransactionIdDropdown && (
-          <div className="absolute w-[32.56rem] h-[14.81rem] bg-white top-[100%] z-50 shadow-md rounded-3xl p-6 flex flex-col">
+          <div className="absolute w-[32.56rem] bg-white top-[100%] z-50 shadow-md rounded-3xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-lg font-bold ">Input Transaction Id</h4>
-
+              <h4 className="text-lg font-bold">Filters</h4>
               <X
                 onClick={() => setSearchTransactionIdDropdown(false)}
                 className="cursor-pointer"
               />
             </div>
-            <input
-              value={searchTransactionId}
-              className="bg-[#F9F9F9] rounded-full py-[1.25rem] mt-6 px-6"
-              placeholder=" eg 8829346 "
-              onChange={(e) => setSearchTransactionId(e.target.value)}
-            />
 
-            <button className="bg-[#4880FF] rounded-[0.375rem] text-white text-sm self-center py-[0.5625rem] px-[2.0625rem] mt-10">
+
+
+            {/* Start Date input */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#AAA5A4]">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                max={today}
+                className="bg-[#F9F9F9] rounded-full py-[1.25rem] px-6 cursor-pointer"
+                onChange={handleStartDateChange}
+              />
+            </div>
+
+            {/* End Date input */}
+            <div className="flex flex-col gap-1">
+              <label
+                className={`text-sm font-medium ${startDate ? "text-[#AAA5A4]" : "text-[#D3D0CF]"
+                  }`}
+              >
+                End Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                max={today}
+                disabled={!startDate}
+                className={`bg-[#F9F9F9] rounded-full py-[1.25rem] px-6 transition-opacity ${startDate
+                  ? "cursor-pointer opacity-100"
+                  : "cursor-not-allowed opacity-40"
+                  }`}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+
+            <button
+              onClick={handleApply}
+              className="bg-[#4880FF] rounded-[0.375rem] text-white text-sm self-center py-[0.5625rem] px-[2.0625rem] mt-2"
+            >
               Apply Now
             </button>
           </div>
