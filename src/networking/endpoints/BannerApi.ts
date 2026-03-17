@@ -1,7 +1,8 @@
 import Cookies from 'universal-cookie'
 import { ApiResponse, Banner, BannerFormData } from "@/types/BannerTypes"
+import { baseUrl } from '../apiUrl'
 
-const BASE = 'https://dev.kikae.com.ng/api'
+const BASE =  baseUrl
 const ADMIN = `${BASE}/admin/banners`
 
 const getAuthHeaders = (): HeadersInit => {
