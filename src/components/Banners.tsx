@@ -1,8 +1,10 @@
 "use client"
 import { mediaUrlPrefix } from '@/networking/apiUrl'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { fetchAllBanners, createBanner, updateBanner, deleteBanner } from "@/networking/endpoints/BannerApi"
 import { Banner, BannerFormData } from "@/types/BannerTypes"
+import Cookies from 'universal-cookie'
+import { baseUrl } from '@/networking/apiUrl'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,6 +19,174 @@ type ToastType = 'success' | 'error'
 interface Toast {
     msg: string
     type: ToastType
+}
+
+// ─── ImagePicker ──────────────────────────────────────────────────────────────
+
+interface ImagePickerProps {
+    value: string          // current file URL stored in form state
+    onChange: (url: string) => void
+}
+
+function ImagePicker({ value, onChange }: ImagePickerProps) {
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [uploading, setUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploading(true)
+        setUploadError(null)
+
+        try {
+            const cookies = new Cookies()
+            const token = cookies.get<string>('authToken')
+
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const res = await fetch(`${baseUrl}/uploadFile`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    // Note: do NOT set Content-Type here; browser sets it with boundary for multipart
+                },
+                body: formData,
+            })
+
+            const result = await res.json()
+
+            if (!res.ok || !result.data) {
+                throw new Error(result.message || 'Upload failed')
+            }
+
+            onChange(result.data)
+        } catch (err) {
+            setUploadError((err as Error).message || 'Upload failed')
+        } finally {
+            setUploading(false)
+            // Reset input so the same file can be re-selected if needed
+            if (inputRef.current) inputRef.current.value = ''
+        }
+    }
+
+    const previewSrc = value ? (value.startsWith('http') ? value : mediaUrlPrefix + value) : null
+
+    return (
+        <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 13, color: '#555', display: 'block', marginBottom: 4 }}>
+                Image
+            </label>
+
+            {/* Hidden native file input */}
+            <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
+
+            {/* Clickable upload zone */}
+            <div
+                onClick={() => !uploading && inputRef.current?.click()}
+                style={{
+                    border: '2px dashed #ddd',
+                    borderRadius: 10,
+                    minHeight: 110,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: uploading ? 'not-allowed' : 'pointer',
+                    background: uploading ? '#fafafa' : '#f9f9f9',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'border-color 0.2s, background 0.2s',
+                }}
+                onMouseEnter={e => {
+                    if (!uploading) (e.currentTarget as HTMLDivElement).style.borderColor = '#1a73e8'
+                }}
+                onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.borderColor = '#ddd'
+                }}
+            >
+                {/* Preview image */}
+                {previewSrc && !uploading && (
+                    <img
+                        src={previewSrc}
+                        alt="Banner preview"
+                        style={{
+                            position: 'absolute', inset: 0,
+                            width: '100%', height: '100%',
+                            objectFit: 'cover',
+                        }}
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            e.currentTarget.style.display = 'none'
+                        }}
+                    />
+                )}
+
+                {/* Overlay hint on hover when image is already set */}
+                {previewSrc && !uploading && (
+                    <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'rgba(0,0,0,0)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 0.2s',
+                        color: 'transparent',
+                        fontSize: 13,
+                        fontWeight: 500,
+                    }}
+                        onMouseEnter={e => {
+                            const el = e.currentTarget as HTMLDivElement
+                            el.style.background = 'rgba(0,0,0,0.45)'
+                            el.style.color = '#fff'
+                        }}
+                        onMouseLeave={e => {
+                            const el = e.currentTarget as HTMLDivElement
+                            el.style.background = 'rgba(0,0,0,0)'
+                            el.style.color = 'transparent'
+                        }}
+                    >
+                        Click to replace
+                    </div>
+                )}
+
+                {/* Upload spinner */}
+                {uploading && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"
+                            style={{ animation: 'spin 0.8s linear infinite' }}>
+                            <circle cx="14" cy="14" r="11" stroke="#ddd" strokeWidth="3" />
+                            <path d="M14 3a11 11 0 0 1 11 11" stroke="#1a73e8" strokeWidth="3" strokeLinecap="round" />
+                            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+                        </svg>
+                        <span style={{ fontSize: 12, color: '#888' }}>Uploading…</span>
+                    </div>
+                )}
+
+                {/* Empty state */}
+                {!previewSrc && !uploading && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="3" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                        <span style={{ fontSize: 12, color: '#aaa' }}>Click to upload image</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Upload error */}
+            {uploadError && (
+                <p style={{ fontSize: 12, color: '#c00', margin: '4px 0 0' }}>{uploadError}</p>
+            )}
+        </div>
+    )
 }
 
 // ─── Components ───────────────────────────────────────────────────────────────
@@ -71,12 +241,20 @@ function BannerForm({ initial, onSubmit, loading }: BannerFormProps) {
 
     return (
         <div>
-            {(['title', 'text', 'file', 'url'] as (keyof BannerFormData)[]).map(k => (
+            {/* Text fields — excluding 'file' which is now handled by ImagePicker */}
+            {(['title', 'text', 'url'] as (keyof BannerFormData)[]).map(k => (
                 <div key={k}>
                     <label style={labelStyle}>{k.charAt(0).toUpperCase() + k.slice(1)}</label>
                     <input type="text" value={form[k] as string} onChange={set(k)} style={inputStyle} />
                 </div>
             ))}
+
+            {/* Image picker replaces the plain 'file' text input */}
+            <ImagePicker
+                value={form.file}
+                onChange={(url) => setForm(f => ({ ...f, file: url }))}
+            />
+
             <div>
                 <label style={labelStyle}>Position</label>
                 <input
