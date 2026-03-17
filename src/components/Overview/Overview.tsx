@@ -20,7 +20,7 @@ import { getCategoriesSales } from "@/networking/endpoints/overview/getCategorie
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-import { FaPrint } from "react-icons/fa";
+import { FaImage, FaPrint } from "react-icons/fa";
 
 import { getChurnOverview } from "@/networking/endpoints/overview/churnOverview";
 import type { ChurnOverviewType } from "@/types/ChurnOverviewType";
@@ -304,11 +304,18 @@ export default function Overview() {
 
         <div>
           <div
-            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2 g"
-            onClick={handlePrint}
-          >
-            <span className="text-kikaeBlue font-bold mr-2">Print</span>
-            <FaPrint />
+            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2 gap-6"
+
+          > <div onClick={handlePrint} className="flex flex-row items-center ">
+
+              <span className="text-kikaeBlue font-bold mr-2">Print</span>
+              <FaPrint />
+            </div>
+            <div className="flex flex-row items-center ">
+
+              <span onClick={() => router.push("/dashboard/banners")} className="text-kikaeBlue font-bold mr-2">Banner Control</span>
+              <FaImage />
+            </div>
           </div>
 
           <button
