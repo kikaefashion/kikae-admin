@@ -18,6 +18,7 @@ export const createCoupon = async ({
     max_users?: number;
     expiry_date?: string;
     allow_multiple: "0" | "1";
+    system_only:number
   };
 }) => {
   const cookies = new Cookies();
