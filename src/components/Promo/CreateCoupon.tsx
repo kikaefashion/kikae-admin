@@ -28,6 +28,7 @@ type FormState = {
   max_users: string;
   expiry_date: string;
   allow_multiple: "0" | "1";
+  system_only: "0" | "1";
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -45,6 +46,7 @@ const defaultValues: FormState = {
   max_users: "",
   expiry_date: "",
   allow_multiple: "0",
+  system_only: "0",
 };
 
 export default function CreateCouponPage() {
@@ -86,8 +88,7 @@ export default function CreateCouponPage() {
         expiry_date: form.expiry_date || undefined,
         info: form.info || undefined,
         code: form.code || undefined,
-        system_only: 1
-
+        system_only: Number(form.system_only) as 0 | 1,
       };
 
       const result = await createCoupon({ couponData: payload });
@@ -252,6 +253,23 @@ export default function CreateCouponPage() {
               <Select
                 value={form.allow_multiple}
                 onValueChange={(v) => handleChange("allow_multiple", v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">No</SelectItem>
+                  <SelectItem value="1">Yes</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* System Only */}
+            <div>
+              <Label>Users can create Coupon *</Label>
+              <Select
+                value={form.system_only}
+                onValueChange={(v) => handleChange("system_only", v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select option" />
