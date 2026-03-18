@@ -28,6 +28,7 @@ type FormState = {
   max_users: string;
   expiry_date: string;
   allow_multiple: "0" | "1";
+  active: 1 | 0
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -45,6 +46,8 @@ const defaultValues: FormState = {
   max_users: "",
   expiry_date: "",
   allow_multiple: "0",
+  active: 1
+
 };
 
 export default function UpdateCouponPage() {
@@ -87,6 +90,7 @@ export default function UpdateCouponPage() {
         expiry_date: form.expiry_date || undefined,
         info: form.info || undefined,
         code: form.code || undefined,
+        active: form.active
       };
 
       const result = await updateCoupon({ couponData: payload, id });
@@ -209,6 +213,22 @@ export default function UpdateCouponPage() {
                   <SelectItem value="logistics">Logistics</SelectItem>
                   <SelectItem value="orders">Orders</SelectItem>
                   <SelectItem value="all">All</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Active Status */}
+            <div>
+              <Label>Status *</Label>
+              <Select
+                value={String(form.active)}
+                onValueChange={(v) => handleChange("active", v as "1" | "0")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Active</SelectItem>
+                  <SelectItem value="0">Inactive</SelectItem>
                 </SelectContent>
               </Select>
             </div>

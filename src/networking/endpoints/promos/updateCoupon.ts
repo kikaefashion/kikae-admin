@@ -10,6 +10,7 @@ export const updateCoupon = async ({
     name: string;
     type: "percentage" | "amount";
     value: number;
+      active: 1|0
 
     info?: string | undefined;
     code?: string;
@@ -20,6 +21,7 @@ export const updateCoupon = async ({
     max_users?: number;
     expiry_date?: string;
     allow_multiple: "0" | "1";
+  
   };
 }) => {
   const cookies = new Cookies();
