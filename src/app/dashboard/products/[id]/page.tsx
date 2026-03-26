@@ -114,6 +114,13 @@ const ProductDetails = () => {
         </div>
       </div>
 
+
+
+      <div>
+
+        {product?.shop.name} | {product?.shop.email}|{product?.shop.phone}
+      </div>
+
       {/* Image Gallery */}
       {product?.media && <ImageGallery images={product?.media} />}
 
