@@ -6,6 +6,7 @@ import CommentModal from "@/components/Product/CommentModal";
 import ImageGallery from "@/components/Product/ProductImage";
 import { getProductDetail } from "@/networking/endpoints/products/getProduct";
 import { productData } from "@/types/ProductType";
+import Link from "next/link";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
@@ -118,7 +119,9 @@ const ProductDetails = () => {
 
       <div>
 
-        {product?.shop.name} | {product?.shop.email}|{product?.shop.phone}
+        <Link className="underline" href={`/dashboard/vendors/${product?.shop.id}?page=products`}>
+          {product?.shop.name}
+        </Link>  | {product?.shop.email}|{product?.shop.phone}
       </div>
 
       {/* Image Gallery */}
