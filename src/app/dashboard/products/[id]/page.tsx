@@ -56,7 +56,12 @@ const ProductDetails = () => {
   }, [params.id]);
 
   console.log({ params });
+  const goToEditPage = () => {
+    router.push(
+      `/dashboard/products/edit/${params.id}?type=${type}`
+    );
 
+  }
   return (
     <div className="p-6 max-w-5xl mx-auto rounded-lg ">
       <MyModal close={() => setOpenModal(false)} isVisible={openModal}>
@@ -103,7 +108,14 @@ const ProductDetails = () => {
             {/*  <button className="text-black text-base font-normal font-['DM Sans'] underline leading-[30px] z-10">
               Chat
             </button> */}
+            <button
+              onClick={goToEditPage}
+              // disabled={isLoading}
 
+              className="text-[#4169e1] text-base font-normal font-['DM Sans'] underline leading-[30px]"
+            >
+              {"Edit"}
+            </button>
             <button
               // disabled={isLoading}
 
