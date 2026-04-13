@@ -50,7 +50,7 @@ function VendorStore() {
         const storeLikesResult = await getStoreLikes(store?.id);
 
         if (result) {
-          setStore(result.data);
+          setStore(result.store);
           setStoreFollowers(storeFollowersResult.data);
           setStoreLikes(storeLikesResult.data);
         }
@@ -67,6 +67,7 @@ function VendorStore() {
   if (isLoading) {
     return <Loader />;
   }
+  console.log({ store })
 
   if (!store) {
     return (
@@ -75,6 +76,7 @@ function VendorStore() {
       </div>
     );
   }
+
 
   return (
     <div className="text-black p-4">
@@ -186,8 +188,8 @@ function VendorStore() {
           <button
             key={tab}
             className={`px-4 py-2 text-sm rounded-3xl capitalize ${page === tab
-                ? "bg-kikaeBlue text-white"
-                : "bg-white text-kikaeGrey"
+              ? "bg-kikaeBlue text-white"
+              : "bg-white text-kikaeGrey"
               }`}
             onClick={() =>
               router.replace(
