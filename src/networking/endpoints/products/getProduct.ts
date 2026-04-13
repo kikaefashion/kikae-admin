@@ -1,13 +1,16 @@
 import { baseUrl } from "@/networking/apiUrl";
+import Cookies from "universal-cookie";
 
 export const getProductDetail = async (product_id: string | number) => {
   try {
-    const response = await fetch(`${baseUrl}/getProduct/${product_id}`, {
+    const cookies = new Cookies()
+    const authToken = cookies.get("authToken")
+    const response = await fetch(`${baseUrl}/admin/products/get/${product_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        //  Authorization: `Bearer 9|wIWpd5hTwD7TpChIvNxgb7Eh8R9vaKYseBzSPs7S`,
+        Authorization: `Bearer ${authToken}`,
       },
     });
     const result = await response.json();

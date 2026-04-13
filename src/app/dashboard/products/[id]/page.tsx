@@ -50,7 +50,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       const product = await getProductDetail(params.id);
-      setProduct(product?.data);
+      setProduct(product?.product);
     };
     fetchProduct();
   }, [params.id]);
