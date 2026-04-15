@@ -137,7 +137,7 @@ export default function EditProductPage() {
             try {
                 setLoading(true);
                 const productResult = await getProductDetail(productId);
-                const product = productResult?.data;
+                const product = productResult?.product;
                 setName(product.name ?? "");
                 setDescription(product.description ?? "");
                 setCategoryId(product.category?.id ? String(product.category.id) : "");
