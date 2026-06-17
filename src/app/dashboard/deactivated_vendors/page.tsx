@@ -1,6 +1,6 @@
 "use client";
 
-import { getStores } from "@/networking/endpoints/vendors/getAllStores";
+import { getDeactivatedVendors } from "@/components/Vendor/getDeactivatedVendors";
 import { reactivateVendor } from "@/networking/endpoints/vendors/reactivateVendor";
 import { singleStoreType } from "@/types/storeType";
 import { useRouter } from "next/navigation";
@@ -28,8 +28,10 @@ const Page = () => {
 
   useEffect(() => {
     const handleGetVendors = async () => {
-      const vendorStores = await getStores();
-      setVendors(vendorStores.data);
+      const vendorStores = await getDeactivatedVendors();
+
+      console.log(vendorStores, "vendor stores");
+      setVendors(vendorStores || []);
     };
 
     handleGetVendors();
