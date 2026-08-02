@@ -41,7 +41,7 @@ const Login = () => {
     })();
   };
 
-  console.log(watch("password")); // watch input value by passing the name of it
+
 
   return (
     <div className="flex flex-col  items-center h-screen justify-center">

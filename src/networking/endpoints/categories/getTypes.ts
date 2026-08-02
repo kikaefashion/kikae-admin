@@ -1,10 +1,10 @@
 import { baseUrl } from "@/networking/apiUrl";
 
-export const getSubCategories = async (categoryId?: number) => {
+export const getTypes = async (subCategoryId?: number) => {
   try {
-    const url = categoryId
-      ? `${baseUrl}/getSubCategories?category_id=${categoryId}`
-      : `${baseUrl}/getSubCategories`;
+    const url = subCategoryId
+      ? `${baseUrl}/getTypes?sub_category_id=${subCategoryId}`
+      : `${baseUrl}/getTypes`;
     const response = await fetch(url, {
       method: "GET",
       headers: {

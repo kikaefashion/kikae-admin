@@ -272,7 +272,7 @@ const Table = () => {
                 <td className="p-3">
                   ₦{item.old_price ? item?.old_price?.toLocaleString() : 0}
                 </td>
-                <td className="p-3">{item.category.name}</td>
+                <td className="p-3">{item.category?.name}</td>
                 <td className="p-3">{item.product_category.name}</td>
                 <td className="p-3">
                   {item.units ? item.units.toLocaleString() : 0}

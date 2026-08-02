@@ -113,7 +113,6 @@ export default function Overview() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-
       const categories = await getCategories();
       setCategories(categories.data);
 
@@ -303,17 +302,19 @@ export default function Overview() {
         </div>
 
         <div>
-          <div
-            className="flex flex-row items-center text-right justify-end cursor-pointer mb-2 gap-6"
-
-          > <div onClick={handlePrint} className="flex flex-row items-center ">
-
+          <div className="flex flex-row items-center text-right justify-end cursor-pointer mb-2 gap-6">
+            {" "}
+            <div onClick={handlePrint} className="flex flex-row items-center ">
               <span className="text-kikaeBlue font-bold mr-2">Print</span>
               <FaPrint />
             </div>
             <div className="flex flex-row items-center ">
-
-              <span onClick={() => router.push("/dashboard/banners")} className="text-kikaeBlue font-bold mr-2">Banner Control</span>
+              <span
+                onClick={() => router.push("/dashboard/banners")}
+                className="text-kikaeBlue font-bold mr-2"
+              >
+                Banner Control
+              </span>
               <FaImage />
             </div>
           </div>
@@ -364,7 +365,7 @@ export default function Overview() {
             {dashboardStats.monthly_revenue
               .reduce(
                 (total, item) => total + Number.parseFloat(item.total_revenue),
-                0
+                0,
               )
               .toLocaleString()}{" "}
             <br />
@@ -395,7 +396,7 @@ export default function Overview() {
           <h2 className="text-lg font-semibold mb-2">New Users per Month</h2>
           New users this month:{" "}
           {dashboardStats.monthly_new_users.find(
-            (item) => item.month === new Date().toISOString().slice(0, 7)
+            (item) => item.month === new Date().toISOString().slice(0, 7),
           )?.total_users || "0"}
           <Bar
             data={newUsersMonthlyData}
@@ -412,7 +413,7 @@ export default function Overview() {
           </h2>
           Wishlist adds:{" "}
           {dashboardStats.monthly_wishlist.find(
-            (item) => item.month === new Date().toISOString().slice(0, 7)
+            (item) => item.month === new Date().toISOString().slice(0, 7),
           )?.total_likes || "0"}
           <Bar
             data={wishlistMonthlyData}
@@ -441,8 +442,9 @@ export default function Overview() {
         />
         <StatCard
           title="Period"
-          value={`${churnRateSummary?.period.start.toLocaleString()} - ${churnRateSummary?.period.end
-            }  `}
+          value={`${churnRateSummary?.period.start.toLocaleString()} - ${
+            churnRateSummary?.period.end
+          }  `}
         />
       </div>
 

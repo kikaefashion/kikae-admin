@@ -5,16 +5,13 @@ export const deleteCategory = async (id: number) => {
   const cookies = new Cookies();
   const authToken = cookies.get("authToken");
   try {
-    const response = await fetch(`${baseUrl}/admin/deleteProductCategory`, {
-      method: "POST",
+    const response = await fetch(`${baseUrl}/admin/categories/${id}`, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${authToken}`,
       },
-      body: JSON.stringify({
-        category_id: id,
-      }),
     });
     const data = await response.json();
     console.log({ data });

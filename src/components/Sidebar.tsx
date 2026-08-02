@@ -20,9 +20,9 @@ const sidebarContents = [
     link: "/users?type=buyers&&page=1",
   },
   {
-    title:"vendors",
-    icon:'',
-    link:"/vendors?type=vendors&&status=approved&&page=1"
+    title: "vendors",
+    icon: "",
+    link: "/vendors?type=vendors&&status=approved&&page=1",
   },
   {
     title: "products",
@@ -56,7 +56,7 @@ const sidebarContents = [
     link: "/runway",
   },
   {
-    title: "categories",
+    title: "product categories",
     icon: "",
     link: "/categories",
   },

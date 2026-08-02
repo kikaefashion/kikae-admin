@@ -4,20 +4,19 @@ import Cookies from "universal-cookie";
 export const editCategory = async (
   id: number,
   name: string,
-  description: string
+  description: string,
 ) => {
   const cookies = new Cookies();
   const authToken = cookies.get("authToken");
   try {
-    const response = await fetch(`${baseUrl}/admin/editProductCategory`, {
-      method: "POST",
+    const response = await fetch(`${baseUrl}/admin/categories/${id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        category_id: id,
         name,
         description,
       }),

@@ -1,24 +1,30 @@
 "use client";
-import { addCategory } from "@/networking/endpoints/categories/addCategory";
+import { addSubCategory } from "@/networking/endpoints/categories/addSubCategory";
 import React, { useState } from "react";
 
-const AddCategory = ({
+const AddSubCategory = ({
   getCategories,
   closeModal,
+  categoryId,
 }: {
   getCategories: () => void;
   closeModal: () => void;
+  categoryId: number;
 }) => {
-  const [newCategory, setNewCategory] = useState({
+  const [newSubCategory, setNewSubCategory] = useState({
     name: "",
     description: "",
   });
   const [saving, setSaving] = useState(false);
 
-  const handleAddCategory = async () => {
-    if (!newCategory.name.trim()) return;
+  const handleAddSubCategory = async () => {
+    if (!newSubCategory.name.trim()) return;
     setSaving(true);
-    await addCategory(newCategory.name, newCategory.description);
+    await addSubCategory(
+      categoryId,
+      newSubCategory.name,
+      newSubCategory.description,
+    );
     getCategories();
     setSaving(false);
     closeModal();
@@ -28,7 +34,7 @@ const AddCategory = ({
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          Add New Category
+          Add New Subcategory
         </h2>
         <button
           onClick={closeModal}
@@ -53,30 +59,32 @@ const AddCategory = ({
       <div className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Category Name <span className="text-red-500">*</span>
+            Subcategory Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            placeholder="e.g. Men's Fashion"
+            placeholder="e.g. Clothing"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
-            value={newCategory.name}
+            value={newSubCategory.name}
             onChange={(e) =>
-              setNewCategory({ ...newCategory, name: e.target.value })
+              setNewSubCategory({ ...newSubCategory, name: e.target.value })
             }
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
             Description
           </label>
           <textarea
-            placeholder="Brief description of this category..."
+            placeholder="Brief description..."
             rows={3}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none resize-none"
-            value={newCategory.description}
+            value={newSubCategory.description}
             onChange={(e) =>
-              setNewCategory({ ...newCategory, description: e.target.value })
+              setNewSubCategory({
+                ...newSubCategory,
+                description: e.target.value,
+              })
             }
           />
         </div>
@@ -90,15 +98,15 @@ const AddCategory = ({
           Cancel
         </button>
         <button
-          onClick={handleAddCategory}
-          disabled={saving || !newCategory.name.trim()}
+          onClick={handleAddSubCategory}
+          disabled={saving || !newSubCategory.name.trim()}
           className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {saving ? "Saving..." : "Save Category"}
+          {saving ? "Saving..." : "Save Subcategory"}
         </button>
       </div>
     </>
   );
 };
 
-export default AddCategory;
+export default AddSubCategory;

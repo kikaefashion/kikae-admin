@@ -1,17 +1,17 @@
 "use client";
-import { editCategory } from "@/networking/endpoints/categories/editCategory";
+import { editType } from "@/networking/endpoints/categories/editType";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import type { AllCategoriesTypes } from "@/types/categoriesType";
+import type { ProductType } from "@/types/categoriesType";
 
-const EditCategory = ({
+const EditType = ({
   getCategories,
   existingData,
 }: {
   getCategories: () => void;
-  existingData: AllCategoriesTypes | null;
+  existingData: ProductType | null;
 }) => {
-  const [newCategory, setNewCategory] = useState({
+  const [newType, setNewType] = useState({
     name: existingData?.name || "",
     description: existingData?.description || "",
   });
@@ -20,17 +20,17 @@ const EditCategory = ({
 
   useEffect(() => {
     if (existingData) {
-      setNewCategory({
+      setNewType({
         name: existingData.name || "",
         description: existingData.description || "",
       });
     }
   }, [existingData]);
 
-  const handleEditCategory = async () => {
-    if (!newCategory.name.trim()) return;
+  const handleEditType = async () => {
+    if (!newType.name.trim()) return;
     setSaving(true);
-    await editCategory(Number(id), newCategory.name, newCategory.description);
+    await editType(Number(id), newType.name, newType.description);
     getCategories();
     setSaving(false);
   };
@@ -38,25 +38,22 @@ const EditCategory = ({
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Edit Category</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Edit Type</h2>
       </div>
 
       <div className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Category Name <span className="text-red-500">*</span>
+            Type Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            placeholder="Category name"
+            placeholder="Type name"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
-            value={newCategory.name}
-            onChange={(e) =>
-              setNewCategory({ ...newCategory, name: e.target.value })
-            }
+            value={newType.name}
+            onChange={(e) => setNewType({ ...newType, name: e.target.value })}
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
             Description
@@ -65,9 +62,9 @@ const EditCategory = ({
             placeholder="Brief description..."
             rows={3}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none resize-none"
-            value={newCategory.description}
+            value={newType.description}
             onChange={(e) =>
-              setNewCategory({ ...newCategory, description: e.target.value })
+              setNewType({ ...newType, description: e.target.value })
             }
           />
         </div>
@@ -75,8 +72,8 @@ const EditCategory = ({
 
       <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200">
         <button
-          onClick={handleEditCategory}
-          disabled={saving || !newCategory.name.trim()}
+          onClick={handleEditType}
+          disabled={saving || !newType.name.trim()}
           className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {saving ? "Saving..." : "Save Changes"}
@@ -86,4 +83,4 @@ const EditCategory = ({
   );
 };
 
-export default EditCategory;
+export default EditType;
