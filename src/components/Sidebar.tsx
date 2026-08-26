@@ -56,6 +56,11 @@ const sidebarContents = [
     link: "/runway",
   },
   {
+    title: "fashion news",
+    icon: "",
+    link: "/fashion-news",
+  },
+  {
     title: "product categories",
     icon: "",
     link: "/categories",
